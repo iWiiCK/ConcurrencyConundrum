@@ -11,7 +11,7 @@ import java.util.Scanner;
  */
 public class Main
 {
-    public static void main(String[] args){
+    public static void main(String[] args) throws InterruptedException {
         // These variables will store the configuration
         // of the Present sorting machine
         
@@ -297,10 +297,14 @@ public class Main
             System.out.println("\nInterim Report @ " + time + "s:");
 
             int giftsInSacks = 0;
-            // TODO - calculate number
+            for (Sack sack : sacks) {
+                giftsInSacks += sack.getCount();
+            }
 
             int giftsInHoppers = 0;
-            // TODO - calculate number
+            for(Hopper hopper : hoppers){
+                giftsInHoppers += hopper.getCount();
+            }
             
             System.out.println(giftsInHoppers + " presents remaining in hoppers;\n" + giftsInSacks + " presents sorted into sacks.\n");
 
@@ -308,14 +312,27 @@ public class Main
         long endTime = System.currentTimeMillis();
         System.out.println("*** Input Stopped after " + (endTime - startTime) / 1000 + "s. ***");
 
-        // TODO
+        //TODO
+
         // Stop the hoppers!
+        for(Hopper hopper : hoppers){
+            hopper.stopHopper();
+        }
         // Stop the tables!
-        // HINT - Wait for everything to finish...
+        for(Turntable table : tables){
+            table.stopTurntable();
+        }
+
+        // Wait for everything to finish...
+        for(Hopper hopper : hoppers){
+            hopper.join();
+        }
+        for(Turntable table : tables){
+            table.join();
+        }
 
         endTime = System.currentTimeMillis();
         System.out.println("*** Machine completed shutdown after " + (endTime - startTime) / 1000 + "s. ***");
-
         
         // FINAL REPORTING
         ////////////////////////////////////////////////////////////////////////
@@ -329,7 +346,7 @@ public class Main
         // TODO - calculate this number!
         
         for (int h = 0; h < numHoppers; h++){
-            System.out.println("Hopper " + hoppers[h].id + " deposited " + /* TODO */ " presents and waited " + /* TODO */ "s.");
+            System.out.println("Hopper " + hoppers[h].getHopperId() + " deposited " + /* TODO */ " presents and waited " + /* TODO */ "s.");
         }
 
         System.out.println();
@@ -344,6 +361,5 @@ public class Main
 
         int missing = giftsDeposited - giftsInSacks - giftsOnMachine;
         System.out.println(missing + " gifts went missing.");
-
     }
 }

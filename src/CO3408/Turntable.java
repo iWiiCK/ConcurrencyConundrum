@@ -10,23 +10,23 @@ import java.util.*;
  */
 public class Turntable extends Thread
 {
-    String id;
-
+    private String id;
     static int N = 0;
     static int E = 1;
     static int S = 2;
     static int W = 3;
     
-    Connection[] connections = new Connection[4];
+    private Connection[] connections = new Connection[4];
         
     // global lookup: age-range -> SackID
     static HashMap<String, Integer> destinations = new HashMap<>();
     
     // this individual table's lookup: SackID -> output port
     HashMap<Integer, Integer> outputMap = new HashMap<>();
+
+    private boolean isRunning = true;
     
-    public Turntable (String ID)
-    {
+    public Turntable (String ID){
         id = ID;
     }
     
@@ -34,20 +34,35 @@ public class Turntable extends Thread
         connections[port] = conn;
         
         if(conn != null){
-            if(conn.connType == ConnectionType.OutputBelt){
-                Iterator<Integer> it = conn.belt.destinations.iterator();
+            if(conn.getConnType() == ConnectionType.OutputBelt){
+                Iterator<Integer> it = conn.getBelt().getDestinations().iterator();
 
                 while(it.hasNext()){
                     outputMap.put(it.next(), port);
                 }
             }
-            else if(conn.connType == ConnectionType.OutputSack){
-                outputMap.put(conn.sack.id, port);
+            else if(conn.getConnType() == ConnectionType.OutputSack){
+                outputMap.put(conn.getSack().getSackId(), port);
             }
         }
     }
     
     public void run(){
         // TODO
+        synchronized (this){
+            while(isRunning){
+                try {
+                    wait();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            System.out.println("Turntable " + id + " STOPPED");
+        }
+    }
+
+    public synchronized void stopTurntable(){
+        isRunning = false;
+        notifyAll();
     }
 }

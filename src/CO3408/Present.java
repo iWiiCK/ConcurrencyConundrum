@@ -7,7 +7,7 @@ package CO3408;
  */
 public class Present
 {
-    String ageRange;
+    private final String ageRange;
 
     public Present(String destination){
         ageRange = destination;
