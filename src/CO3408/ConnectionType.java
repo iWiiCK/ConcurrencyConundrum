@@ -2,7 +2,7 @@ package CO3408;
 
 /**
  *
- * @author npmitchell
+ * @author Heshan Wickramaratne
  */
 public enum ConnectionType {
     InputBelt,

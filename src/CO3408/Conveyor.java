@@ -3,7 +3,7 @@ package CO3408;
 import java.util.HashSet;
 /**
  *
- * @author Nick
+ * @author Heshan Wickramaratne
  */
 public class Conveyor
 {
@@ -13,15 +13,14 @@ public class Conveyor
     
     // TODO - add more members?
     
-    public Conveyor(int id, int size)
-    {
+    public Conveyor(int id, int size){
         this.id = id;
         presents = new Present[size];
         
         //TODO - more construction likely!
     }
-    public void addDestination(int hopperID)
-    {
+
+    public void addDestination(int hopperID){
         destinations.add(hopperID);
     }
 
