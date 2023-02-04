@@ -3,7 +3,7 @@ package CO3408;
 
 /**
  *
- * @author Nick
+ * @author Heshan Wickramaratne
  */
 public class Sack
 {
@@ -16,5 +16,4 @@ public class Sack
     }
 
     //TODO - Add more methods
-    
 }

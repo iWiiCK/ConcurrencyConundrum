@@ -3,7 +3,7 @@ package CO3408;
 
 /**
  *
- * @author Nick
+ * @author Heshan Wickramaratne
  */
 public class Present
 {
