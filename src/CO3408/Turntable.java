@@ -6,7 +6,7 @@ import java.util.*;
 
 /**
  *
- * @author Nick
+ * @author Heshan Wickramaratne
  */
 public class Turntable extends Thread
 {
@@ -30,29 +30,24 @@ public class Turntable extends Thread
         id = ID;
     }
     
-    public void addConnection(int port, Connection conn)
-    {
+    public void addConnection(int port, Connection conn){
         connections[port] = conn;
         
-        if(conn != null)
-        {
-            if(conn.connType == ConnectionType.OutputBelt)
-            {
+        if(conn != null){
+            if(conn.connType == ConnectionType.OutputBelt){
                 Iterator<Integer> it = conn.belt.destinations.iterator();
-                while(it.hasNext())
-                {
+
+                while(it.hasNext()){
                     outputMap.put(it.next(), port);
                 }
             }
-            else if(conn.connType == ConnectionType.OutputSack)
-            {
+            else if(conn.connType == ConnectionType.OutputSack){
                 outputMap.put(conn.sack.id, port);
             }
         }
     }
     
-    public void run()
-    {
+    public void run(){
         // TODO
     }
 }

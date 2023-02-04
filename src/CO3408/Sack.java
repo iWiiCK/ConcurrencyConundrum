@@ -10,8 +10,7 @@ public class Sack
     int id;
     Present[] accumulation;
     
-    public Sack(int id, int capacity)
-    {
+    public Sack(int id, int capacity){
         accumulation = new Present[capacity];
         this.id = id;
     }

@@ -9,13 +9,11 @@ public class Present
 {
     String ageRange;
 
-    public Present(String destination)
-    {
+    public Present(String destination){
         ageRange = destination;
     }
     
-    public String readDestination()
-    {
+    public String readDestination(){
         return ageRange;
     }
     

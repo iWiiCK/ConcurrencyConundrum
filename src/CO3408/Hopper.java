@@ -3,7 +3,7 @@ package CO3408;
 
 /**
  *
- * @author Nick
+ * @author Heshan Wickramaratne
  */
 public class Hopper extends Thread
 {
@@ -13,21 +13,18 @@ public class Hopper extends Thread
 
     Present[] collection;
     
-    public Hopper(int id, Conveyor con, int capacity, int speed)
-    {
+    public Hopper(int id, Conveyor con, int capacity, int speed){
         collection = new Present[capacity];
         this.id = id;
         belt = con;
         this.speed = speed;
     }
     
-    public void fill(Present p)
-    {
+    public void fill(Present p){
         // TODO
     }
 
-    public void run()
-    {
+    public void run(){
         // TODO
     }
     
