@@ -11,7 +11,7 @@ import java.util.Scanner;
  */
 public class Main
 {
-    public static void main(String[] args){
+    public static void main(String[] args) throws InterruptedException {
         // These variables will store the configuration
         // of the Present sorting machine
         
@@ -72,7 +72,6 @@ public class Main
                 int dest = beltStream.nextInt();
                 belts[b].addDestination(dest);
             }
-            //System.out.println("Set up Belt " + id);
         } // end of reading belt lines
 
         // READ HOPPERS
@@ -104,8 +103,6 @@ public class Main
             line = inputStream.nextLine(); // skip rest of line
 
             hoppers[h] = new Hopper(id, belts[belt - 1], capacity, speed);
-
-            //System.out.println("Set up Hopper " + id);
         } // end of reading hopper lines
 
         // READ SACKS
@@ -135,8 +132,6 @@ public class Main
 
             sacks[s] = new Sack(id, capacity);
             Turntable.destinations.put(age, id);
-
-            //System.out.println("Set up Sack " + id);
         } // end of reading sack lines
 
         // READ TURNTABLES
@@ -156,7 +151,7 @@ public class Main
             // A N ib 1 E null S os 1 W null
 
             String tableId = inputStream.next();
-            tables[t] = new Turntable(tableId);
+            tables[t] = new Turntable(tableId, sacks);
 
             int connId;
 
@@ -296,11 +291,8 @@ public class Main
             time = (currentTime - startTime) / 1000;
             System.out.println("\nInterim Report @ " + time + "s:");
 
-            int giftsInSacks = 0;
-            // TODO - calculate number
-
-            int giftsInHoppers = 0;
-            // TODO - calculate number
+            int giftsInSacks = countGiftsIn(sacks);
+            int giftsInHoppers = countGiftsIn(hoppers);
             
             System.out.println(giftsInHoppers + " presents remaining in hoppers;\n" + giftsInSacks + " presents sorted into sacks.\n");
 
@@ -308,28 +300,40 @@ public class Main
         long endTime = System.currentTimeMillis();
         System.out.println("*** Input Stopped after " + (endTime - startTime) / 1000 + "s. ***");
 
-        // TODO
         // Stop the hoppers!
+        for(Hopper hopper : hoppers){
+            hopper.stopHopper();
+        }
         // Stop the tables!
-        // HINT - Wait for everything to finish...
+        for(Turntable table : tables){
+            table.stopTurntable();
+        }
+
+        // Wait for everything to finish...
+        for(Hopper hopper : hoppers){
+            hopper.join();
+        }
+        for(Turntable table : tables){
+            table.join();
+        }
 
         endTime = System.currentTimeMillis();
         System.out.println("*** Machine completed shutdown after " + (endTime - startTime) / 1000 + "s. ***");
-
         
         // FINAL REPORTING
         ////////////////////////////////////////////////////////////////////////
         
         System.out.println();
-        System.out.println("\nFINAL REPORT\n");
+        System.out.println("\n////////////////////////////////////////////////////////");
+        System.out.println("FINAL REPORT");
+        System.out.println("////////////////////////////////////////////////////////\n");
         System.out.println("Configuration: " + FILE_NAME);
         System.out.println("Total Run Time" + (endTime - startTime) / 1000 + "s.");
         
-        int giftsDeposited = 0;
-        // TODO - calculate this number!
+        int giftsDeposited = countGiftsDeposited(hoppers);
         
         for (int h = 0; h < numHoppers; h++){
-            System.out.println("Hopper " + hoppers[h].id + " deposited " + /* TODO */ " presents and waited " + /* TODO */ "s.");
+            System.out.println("Hopper " + hoppers[h].getHopperId() + " deposited " +giftsDeposited + " presents and waited " + (endTime - hoppers[h].getHopperEmptiedTimestamp())/1000 + "s.");
         }
 
         System.out.println();
@@ -344,6 +348,38 @@ public class Main
 
         int missing = giftsDeposited - giftsInSacks - giftsOnMachine;
         System.out.println(missing + " gifts went missing.");
+    }
 
+    //Return the count of Gifts in Sacks
+    /////////////////////////////////////////
+    public static int countGiftsIn(Sack[] sacks){
+        int giftsInSacks = 0;
+        for (Sack sack : sacks) {
+            giftsInSacks += sack.getCount();
+        }
+
+        return giftsInSacks;
+    }
+
+    //Return the count of Gifts in Hoppers
+    /////////////////////////////////////////////
+    public static int countGiftsIn(Hopper[] hoppers){
+        int giftsInHoppers = 0;
+        for(Hopper hopper : hoppers){
+            giftsInHoppers += hopper.getCount();
+        }
+
+        return giftsInHoppers;
+    }
+
+    //Return the count of Gifts in Hoppers
+    /////////////////////////////////////////
+    public static int countGiftsDeposited(Hopper[] hoppers){
+        int giftsDeposited = 0;
+        for(Hopper hopper : hoppers){
+            giftsDeposited += hopper.getDepositCount();
+        }
+
+        return giftsDeposited;
     }
 }

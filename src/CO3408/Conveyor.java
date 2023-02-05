@@ -7,23 +7,53 @@ import java.util.HashSet;
  */
 public class Conveyor
 {
-    int id;
+    private final int id;
     private Present[] presents; // The requirements say this must be a fixed size array
-    public  HashSet<Integer> destinations = new HashSet();
-    
-    // TODO - add more members?
+    private final HashSet<Integer> destinations = new HashSet<>();
+    private final int size;
+    private int count = 0;
+    private final CustomLock conveyorLock = new CustomLock("conveyorLock");
+    private final Utils utils = new Utils();
     
     public Conveyor(int id, int size){
         this.id = id;
-        presents = new Present[size];
-        
-        //TODO - more construction likely!
+        this.presents = new Present[size];
+        this.size = size;
     }
 
     public void addDestination(int hopperID){
         destinations.add(hopperID);
     }
 
-    // TODO - add more functions
-    
+    public boolean isFull(){
+        return count >= size;
+    }
+
+    //Adding presents to the Belt
+    public void add(Present p ) throws InterruptedException {
+        presents[count] = p;
+        count++;
+    }
+
+    //Give the present added earliest to the Turntable.
+    public Present requestPresent(){
+        Present earliestPresent = presents[0];
+        presents = utils.popFirstAndReArrange(presents);
+        count--;
+
+        conveyorLock.unlock();
+        return earliestPresent;
+    }
+
+    public HashSet<Integer> getDestinations() {
+        return destinations;
+    }
+
+    public CustomLock getConveyorLock(){
+        return conveyorLock;
+    }
+
+    public int getCount() {
+        return count;
+    }
 }
