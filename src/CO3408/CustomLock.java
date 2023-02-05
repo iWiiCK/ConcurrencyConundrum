@@ -2,10 +2,16 @@ package CO3408;
 
 public class CustomLock
 {
+    private String id;
     private boolean locked = false;
-    private Object lock = new Object();
+    private final Object lock = new Object();
+
+    public CustomLock(String id) {
+        this.id = id;
+    }
 
     public synchronized void lock() throws InterruptedException {
+        System.out.println(id + " :: LOCKED");
         while (locked) {
             wait();
         }
@@ -13,6 +19,7 @@ public class CustomLock
     }
 
     public synchronized void unlock() {
+        System.out.println(id + " :: UNLOCKED");
         locked = false;
         notifyAll();
     }

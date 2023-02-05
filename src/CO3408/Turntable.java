@@ -10,13 +10,13 @@ import java.util.*;
  */
 public class Turntable extends Thread
 {
-    private String id;
+    private final String id;
     static int N = 0;
     static int E = 1;
     static int S = 2;
     static int W = 3;
     
-    private Connection[] connections = new Connection[4];
+    private final Connection[] connections = new Connection[4];
         
     // global lookup: age-range -> SackID
     static HashMap<String, Integer> destinations = new HashMap<>();
