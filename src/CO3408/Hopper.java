@@ -25,7 +25,9 @@ public class Hopper extends Thread
         this.speed = speed;
         this.capacity = capacity;
     }
-    
+
+    //Fill the hopper at the setup of the program
+    //////////////////////////////////////////////
     public void fill(Present p){
         if(!isFull()){
             collection[count] = p;
@@ -36,6 +38,10 @@ public class Hopper extends Thread
         }
     }
 
+    /**
+     * Thread Run Method
+     * ////////////////////////////////////////////////
+     * */
     public void run(){
         synchronized (this){
             while(isRunning){
@@ -50,6 +56,7 @@ public class Hopper extends Thread
     }
 
     //Depositing presents to the belt.
+    ////////////////////////////////////////////
     public synchronized void deposit() throws InterruptedException {
         while(belt.getConveyorLock().isLocked()){
             wait();
@@ -89,6 +96,8 @@ public class Hopper extends Thread
         return id;
     }
 
+    //Used to Stop the Thread ones the Time is up for the Simulation
+    ////////////////////////////////////////////////////////////////////
     public synchronized void stopHopper(){
         isRunning = false;
         belt.getConveyorLock().unlock();

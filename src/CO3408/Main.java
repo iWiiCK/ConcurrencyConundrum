@@ -151,7 +151,7 @@ public class Main
             // A N ib 1 E null S os 1 W null
 
             String tableId = inputStream.next();
-            tables[t] = new Turntable(tableId);
+            tables[t] = new Turntable(tableId, sacks);
 
             int connId;
 
@@ -351,6 +351,7 @@ public class Main
     }
 
     //Return the count of Gifts in Sacks
+    /////////////////////////////////////////
     public static int countGiftsIn(Sack[] sacks){
         int giftsInSacks = 0;
         for (Sack sack : sacks) {
@@ -361,6 +362,7 @@ public class Main
     }
 
     //Return the count of Gifts in Hoppers
+    /////////////////////////////////////////////
     public static int countGiftsIn(Hopper[] hoppers){
         int giftsInHoppers = 0;
         for(Hopper hopper : hoppers){
@@ -371,6 +373,7 @@ public class Main
     }
 
     //Return the count of Gifts in Hoppers
+    /////////////////////////////////////////
     public static int countGiftsDeposited(Hopper[] hoppers){
         int giftsDeposited = 0;
         for(Hopper hopper : hoppers){

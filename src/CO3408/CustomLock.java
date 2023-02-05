@@ -19,9 +19,11 @@ public class CustomLock
     }
 
     public synchronized void unlock() {
-        System.out.println(id + " :: UNLOCKED");
-        locked = false;
-        notifyAll();
+        if(locked){
+            System.out.println(id + " :: UNLOCKED");
+            locked = false;
+            notifyAll();
+        }
     }
 
     public boolean isLocked() {

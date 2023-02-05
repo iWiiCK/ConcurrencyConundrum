@@ -13,7 +13,7 @@ public class Present
         ageRange = destination;
     }
     
-    public String readDestination(){
+    public String getAgeRange(){
         return ageRange;
     }
     
