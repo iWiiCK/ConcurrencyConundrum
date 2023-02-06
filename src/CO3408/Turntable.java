@@ -22,11 +22,15 @@ public class Turntable extends Thread
     static HashMap<String, Integer> destinations = new HashMap<>();
 
     // this individual table's lookup: SackID -> output port
-    private HashMap<Integer, Integer> outputMap = new HashMap<>();
-
-    private Sack[] sacks;
-
+    private final HashMap<Integer, Integer> outputMap = new HashMap<>();
+    private final Sack[] sacks;
+    private int count = 0;
     private boolean isRunning = true;
+
+    private boolean isIdle = true;
+
+    private boolean spinned = false;
+
     public Turntable (String ID, Sack[] sacks){
         id = ID;
         this.sacks = sacks;
@@ -51,7 +55,7 @@ public class Turntable extends Thread
 
     //Adding a present from the turntable to a Sack
     //////////////////////////////////////////////////////
-    private void addToSack(int sackId, Present present){
+    private synchronized void addToSack(int sackId, Present present){
         System.out.println("Adding to Sack " + sackId);
         for(Sack sack : sacks){
             //Add only if the sack has space.
@@ -75,7 +79,10 @@ public class Turntable extends Thread
 
             if (currentConnection != null && currentConnection.getConnType() == ConnectionType.InputBelt) {
                 if (currentConnection.getBelt().getCount() > 0) {
+                    isIdle = false;
+                    System.out.println("Turntable " + id + " requested Present");
                     Present currentPresent = currentConnection.getBelt().requestPresent();
+                    count++;
                     //Simulating Present getting on the Turntable
                     long presentHandlingDelay = (long) (0.75 * 1000);
                     Thread.sleep(presentHandlingDelay);
@@ -92,7 +99,11 @@ public class Turntable extends Thread
 
                     //Simulating Present getting off the Turntable and into Sacks
                     addToSack(sackId, currentPresent);
+                    count--;
                     Thread.sleep(presentHandlingDelay);
+                }
+                else{
+                    isIdle = true;
                 }
             }
         }
@@ -103,16 +114,22 @@ public class Turntable extends Thread
      * ////////////////////////////////////////////////
      * */
     public void run(){
-        // TODO
         synchronized (this){
             while(isRunning){
                 try {
+                    if(!isIdle) spinned = true;
+                    if(spinned && isIdle){
+                        break;
+                    }
                     runTurntable();
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             }
+            System.out.println("\n=====================================================");
             System.out.println("Turntable " + id + " STOPPED");
+            System.out.println("[Present Remaining :: " + count + "]");
+            System.out.println("=====================================================\n");
         }
     }
 
@@ -121,5 +138,9 @@ public class Turntable extends Thread
     public synchronized void stopTurntable(){
         isRunning = false;
         notifyAll();
+    }
+
+    public int getCount() {
+        return count;
     }
 }

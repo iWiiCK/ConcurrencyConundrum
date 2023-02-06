@@ -223,7 +223,6 @@ public class Main
             }
 
             line = inputStream.nextLine(); // skip rest of line
-            //System.out.println("Set up turntable " + tableId);
         } // end of reading turntable lines
 
         // FILL THE HOPPERS
@@ -241,8 +240,6 @@ public class Main
                 hoppers[i].fill(new Present(inputStream.next()));
                 line = inputStream.nextLine();
             }
-
-            //System.out.println("Filled Hopper " + hoppers[i].id);
         }
 
         // READ TIMER LENGTH
@@ -256,7 +253,8 @@ public class Main
         timerStream.next(); // skip "length"
         timerLength = timerStream.nextInt();
 
-        System.out.println("Machine will run for " + timerLength + "s.\n");
+        System.out.println("\nMachine will run for " + timerLength + "s.");
+        System.out.println("-----------------------------------------------------\n");
 
         ///////////////////////////////////////////////////////////////////////
         // END OF SETUP ///////////////////////////////////////////////////////
@@ -276,7 +274,10 @@ public class Main
         long time = 0;
         long currentTime;
         long startTime = System.currentTimeMillis();
+
+        System.out.println("/////////////////////////////////////////////////////");
         System.out.println("*** Machine Started ***");
+        System.out.println("/////////////////////////////////////////////////////\n");
 
         while (time < timerLength){
             // sleep in 10 second bursts
@@ -289,16 +290,20 @@ public class Main
 
             currentTime = System.currentTimeMillis();
             time = (currentTime - startTime) / 1000;
-            System.out.println("\nInterim Report @ " + time + "s:");
+            System.out.println("\n=====================================================");
+            System.out.println("Interim Report @ " + time + "s:");
 
-            int giftsInSacks = countGiftsIn(sacks);
-            int giftsInHoppers = countGiftsIn(hoppers);
+            int giftsInSacks = Utils.countGiftsIn(sacks);
+            int giftsInHoppers = Utils.countGiftsIn(hoppers);
             
-            System.out.println(giftsInHoppers + " presents remaining in hoppers;\n" + giftsInSacks + " presents sorted into sacks.\n");
+            System.out.println(giftsInHoppers + " presents remaining in hoppers;\n" + giftsInSacks + " presents sorted into sacks.");
+            System.out.println("=====================================================\n");
 
         }
         long endTime = System.currentTimeMillis();
+        System.out.println("/////////////////////////////////////////////////////");
         System.out.println("*** Input Stopped after " + (endTime - startTime) / 1000 + "s. ***");
+        System.out.println("/////////////////////////////////////////////////////");
 
         // Stop the hoppers!
         for(Hopper hopper : hoppers){
@@ -318,19 +323,19 @@ public class Main
         }
 
         endTime = System.currentTimeMillis();
+        System.out.println("/////////////////////////////////////////////////////");
         System.out.println("*** Machine completed shutdown after " + (endTime - startTime) / 1000 + "s. ***");
+        System.out.println("/////////////////////////////////////////////////////");
         
         // FINAL REPORTING
         ////////////////////////////////////////////////////////////////////////
-        
-        System.out.println();
-        System.out.println("\n////////////////////////////////////////////////////////");
-        System.out.println("FINAL REPORT");
-        System.out.println("////////////////////////////////////////////////////////\n");
+
+        System.out.println("\nFINAL REPORT");
+        System.out.println("-----------------------------------------\n");
         System.out.println("Configuration: " + FILE_NAME);
         System.out.println("Total Run Time" + (endTime - startTime) / 1000 + "s.");
         
-        int giftsDeposited = countGiftsDeposited(hoppers);
+        int giftsDeposited = Utils.countGiftsDeposited(hoppers);
         
         for (int h = 0; h < numHoppers; h++){
             System.out.println("Hopper " + hoppers[h].getHopperId() + " deposited " +giftsDeposited + " presents and waited " + (endTime - hoppers[h].getHopperEmptiedTimestamp())/1000 + "s.");
@@ -338,9 +343,8 @@ public class Main
 
         System.out.println();
 
-        int giftsOnMachine = 0;
-        int giftsInSacks = 0;
-        // TODO - calculate these numbers!
+        int giftsOnMachine = Utils.countGiftsIn(tables) + Utils.countGiftsIn(belts);
+        int giftsInSacks = Utils.countGiftsIn(sacks);
         
         System.out.print("\nOut of " + giftsDeposited + " gifts deposited, ");
         System.out.print(giftsOnMachine + " are still on the machine, and ");
@@ -348,38 +352,5 @@ public class Main
 
         int missing = giftsDeposited - giftsInSacks - giftsOnMachine;
         System.out.println(missing + " gifts went missing.");
-    }
-
-    //Return the count of Gifts in Sacks
-    /////////////////////////////////////////
-    public static int countGiftsIn(Sack[] sacks){
-        int giftsInSacks = 0;
-        for (Sack sack : sacks) {
-            giftsInSacks += sack.getCount();
-        }
-
-        return giftsInSacks;
-    }
-
-    //Return the count of Gifts in Hoppers
-    /////////////////////////////////////////////
-    public static int countGiftsIn(Hopper[] hoppers){
-        int giftsInHoppers = 0;
-        for(Hopper hopper : hoppers){
-            giftsInHoppers += hopper.getCount();
-        }
-
-        return giftsInHoppers;
-    }
-
-    //Return the count of Gifts in Hoppers
-    /////////////////////////////////////////
-    public static int countGiftsDeposited(Hopper[] hoppers){
-        int giftsDeposited = 0;
-        for(Hopper hopper : hoppers){
-            giftsDeposited += hopper.getDepositCount();
-        }
-
-        return giftsDeposited;
     }
 }
