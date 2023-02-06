@@ -51,36 +51,34 @@ public class Hopper extends Thread
                     throw new RuntimeException(e);
                 }
             }
-            System.out.println("Hopper " + id + " STOPPED");
+            System.out.println("\n=====================================================");
+            System.out.println("*** Hopper " + id + " STOPPED ***");
+            System.out.println("[Present Remaining :: " + count + "]");
+            System.out.println("=====================================================\n");
         }
     }
 
     //Depositing presents to the belt.
     ////////////////////////////////////////////
     public synchronized void deposit() throws InterruptedException {
-        while(belt.getConveyorLock().isLocked()){
-            wait();
-        }
-        if(count > 0){
-            if(!belt.isFull()){
-                System.out.println("Hopper "+ id + " DEPOSITING");
-                //Assuming speed is the deposit speed in seconds.
-                // Ex: Speed 1 = presents are deposited every 1 second.
-                sleep(speed * 1000L);
-
-                belt.add(collection[0]);
-                depositCount++;
-                count--;
-                collection = utils.popFirstAndReArrange(collection);
-            }
-            else{
-                //Locking belt if the capacity is reached.
-                belt.getConveyorLock().lock();
-            }
-        }
-        else{
+        while(count < 1){
             System.out.println("Hopper " + id + " is EMPTY");
             hopperEmptiedTimestamp = System.currentTimeMillis();
+
+            if(isRunning)
+                wait();
+            break;
+        }
+        if(!belt.isFull() && isRunning){
+            System.out.println("Hopper "+ id + " DEPOSITING");
+            //Assuming speed is the deposit speed in seconds.
+            // Ex: Speed 1 = presents are deposited every 1 second.
+            sleep(speed * 1000L);
+
+            belt.add(collection[0]);
+            depositCount++;
+            count--;
+            collection = utils.popFirstAndReArrange(collection);
         }
     }
 

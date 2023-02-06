@@ -25,22 +25,26 @@ public class Conveyor
         destinations.add(hopperID);
     }
 
-    public boolean isFull(){
+    public synchronized boolean isFull(){
         return count >= size;
     }
 
     //Adding presents to the Belt
-    public void add(Present p ) throws InterruptedException {
+    public synchronized void add(Present p ) throws InterruptedException {
         presents[count] = p;
         count++;
+        System.out.println("Presents on Belt " + id + " :: "+ count);
+
+        if(count == size){
+            conveyorLock.lock();
+        }
     }
 
     //Give the present added earliest to the Turntable.
-    public Present requestPresent(){
+    public synchronized Present requestPresent(){
         Present earliestPresent = presents[0];
         presents = utils.popFirstAndReArrange(presents);
         count--;
-
         conveyorLock.unlock();
         return earliestPresent;
     }

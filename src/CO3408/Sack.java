@@ -19,12 +19,12 @@ public class Sack
     }
 
     //TODO - Add more methods
-    public boolean isFull(){
+    public synchronized boolean isFull(){
         return count == capacity;
     }
 
     //Adding Presents to the Sack.
-    public void add(Present p){
+    public synchronized void add(Present p){
         if(!isFull()){
             accumulation[count] = p;
             count++;
