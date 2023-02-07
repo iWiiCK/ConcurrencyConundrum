@@ -60,4 +60,8 @@ public class Conveyor
     public int getCount() {
         return count;
     }
+
+    public int getId() {
+        return id;
+    }
 }

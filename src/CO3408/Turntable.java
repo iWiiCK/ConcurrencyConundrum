@@ -52,16 +52,18 @@ public class Turntable extends Thread
 
     //Adding a present from the turntable to a Sack
     //////////////////////////////////////////////////////
-    private synchronized void addToSack(int sackId, Present present){
-        System.out.println("Adding to Sack " + sackId);
+    private synchronized void addToSack(int sackId, Present present) throws InterruptedException {
         for(Sack sack : sacks){
             //Add only if the sack has space.
             if(sack.getSackId() == sackId){
                 if(!sack.isFull()){
+                    System.out.println("Adding to Sack " + sackId);
                     sack.add(present);
+                    count--;
                     break;
                 }else{
-                    System.out.println("*** Sack " + id + " is FULL ***");
+                    System.out.println("*** Sack " + sackId + " is FULL :: Locking Sack " + sackId + " ***");
+                    sack.getSackLock().lock();
                 }
             }
         }
@@ -75,7 +77,7 @@ public class Turntable extends Thread
             Connection currentConnection = connections[port];
 
             if (currentConnection != null && currentConnection.getConnType() == ConnectionType.InputBelt) {
-                if (currentConnection.getBelt().getCount() > 0) {
+                if (currentConnection.getBelt().getCount() > 0 ) {
                     System.out.println("Turntable " + id + " requested Present");
                     Present currentPresent = currentConnection.getBelt().requestPresent();
                     count++;
@@ -95,7 +97,6 @@ public class Turntable extends Thread
 
                     //Simulating Present getting off the Turntable and into Sacks
                     addToSack(sackId, currentPresent);
-                    count--;
                     Thread.sleep(presentHandlingDelay);
                     return true;
                 }

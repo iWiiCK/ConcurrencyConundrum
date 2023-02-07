@@ -33,7 +33,7 @@ public class Main
         
         // READ FILE
         // =========
-        final String FILE_NAME = "scenario3.txt";
+        final String FILE_NAME = "scenario5.txt";
         Scanner inputStream = null;
         try{
             inputStream = new Scanner(new File("src/Scenarios/" + FILE_NAME));
@@ -315,8 +315,7 @@ public class Main
         }
 
         // Wait for everything to finish...
-        System.out.println("\n/////////////////////////////////////////////////////");
-        System.out.println("STOPPING HOPPER & TURNTABLE");
+        System.out.println();
         for(Hopper hopper : hoppers){
             hopper.join();
         }
@@ -336,7 +335,7 @@ public class Main
         System.out.println("\nFINAL REPORT");
         System.out.println("-----------------------------------------\n");
         System.out.println("Configuration: " + FILE_NAME);
-        System.out.println("Total Run Time" + (endTime - startTime) / 1000 + "s.");
+        System.out.println("Total Run Time: " + (endTime - startTime) / 1000 + "s.");
         
         int giftsDeposited = Utils.countGiftsDeposited(hoppers);
         
