@@ -33,7 +33,7 @@ public class Main
         
         // READ FILE
         // =========
-        final String FILE_NAME = "scenario1.txt";
+        final String FILE_NAME = "scenario3.txt";
         Scanner inputStream = null;
         try{
             inputStream = new Scanner(new File("src/Scenarios/" + FILE_NAME));
@@ -315,12 +315,15 @@ public class Main
         }
 
         // Wait for everything to finish...
+        System.out.println("\n/////////////////////////////////////////////////////");
+        System.out.println("STOPPING HOPPER & TURNTABLE");
         for(Hopper hopper : hoppers){
             hopper.join();
         }
         for(Turntable table : tables){
             table.join();
         }
+        System.out.println("/////////////////////////////////////////////////////\n");
 
         endTime = System.currentTimeMillis();
         System.out.println("/////////////////////////////////////////////////////");

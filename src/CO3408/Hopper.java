@@ -14,7 +14,7 @@ public class Hopper extends Thread
     private int count = 0;
     private int depositCount = 0;
     private final int capacity;
-    private boolean isRunning = true;
+    private volatile boolean isRunning = true;
     private long hopperEmptiedTimestamp = System.currentTimeMillis();
     private final Utils utils = new Utils();
     
@@ -34,7 +34,7 @@ public class Hopper extends Thread
             count++;
         }
         else{
-            System.out.println("Hopper " + id + " is FULL");
+            System.out.println("*** Hopper " + id + " is FULL ***");
         }
     }
 
@@ -51,10 +51,7 @@ public class Hopper extends Thread
                     throw new RuntimeException(e);
                 }
             }
-            System.out.println("\n=====================================================");
-            System.out.println("*** Hopper " + id + " STOPPED ***");
-            System.out.println("[Present Remaining :: " + count + "]");
-            System.out.println("=====================================================\n");
+            System.out.println("*** Hopper " + id + " STOPPED :: [Present Remaining :: " + count + "] ***");
         }
     }
 
@@ -62,15 +59,17 @@ public class Hopper extends Thread
     ////////////////////////////////////////////
     public synchronized void deposit() throws InterruptedException {
         while(count < 1){
-            System.out.println("Hopper " + id + " is EMPTY");
-            hopperEmptiedTimestamp = System.currentTimeMillis();
-
-            if(isRunning)
+            if(isRunning){
+                System.out.println("*** Hopper " + id + " is EMPTY ***");
+                hopperEmptiedTimestamp = System.currentTimeMillis();
                 wait();
-            break;
+            }else{
+                break;
+            }
         }
+
         if(!belt.isFull() && isRunning){
-            System.out.println("Hopper "+ id + " DEPOSITING");
+            System.out.println("Hopper "+ id + " DEPOSITING :: Remaining [" + count + "]");
             //Assuming speed is the deposit speed in seconds.
             // Ex: Speed 1 = presents are deposited every 1 second.
             sleep(speed * 1000L);
@@ -96,10 +95,11 @@ public class Hopper extends Thread
 
     //Used to Stop the Thread ones the Time is up for the Simulation
     ////////////////////////////////////////////////////////////////////
-    public synchronized void stopHopper(){
+    public void stopHopper(){
         isRunning = false;
-        belt.getConveyorLock().unlock();
-        notifyAll();
+        synchronized (this){
+            notifyAll();
+        }
     }
 
     public int getDepositCount() {
