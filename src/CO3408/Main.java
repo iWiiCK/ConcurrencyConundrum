@@ -33,7 +33,7 @@ public class Main
         
         // READ FILE
         // =========
-        final String FILE_NAME = "scenario1.txt";
+        final String FILE_NAME = "scenario5.txt";
         Scanner inputStream = null;
         try{
             inputStream = new Scanner(new File("src/Scenarios/" + FILE_NAME));
@@ -151,7 +151,7 @@ public class Main
             // A N ib 1 E null S os 1 W null
 
             String tableId = inputStream.next();
-            tables[t] = new Turntable(tableId, sacks);
+            tables[t] = new Turntable(tableId);
 
             int connId;
 

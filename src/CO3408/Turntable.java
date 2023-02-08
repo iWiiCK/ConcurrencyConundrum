@@ -23,14 +23,12 @@ public class Turntable extends Thread
 
     // this individual table's lookup: SackID -> output port
     private final HashMap<Integer, Integer> outputMap = new HashMap<>();
-    private final Sack[] sacks;
     private int count = 0;
     private volatile boolean isRunning = true;
     private boolean itemsRemainingInBelt = false;
 
-    public Turntable (String ID, Sack[] sacks){
+    public Turntable (String ID){
         id = ID;
-        this.sacks = sacks;
     }
 
     public void addConnection(int port, Connection conn){
@@ -52,29 +50,39 @@ public class Turntable extends Thread
 
     //Adding a present from the turntable to a Sack
     //////////////////////////////////////////////////////
-    private synchronized void addToSack(int sackId, Present present) throws InterruptedException {
-        for(Sack sack : sacks){
-            //Add only if the sack has space.
-            if(sack.getSackId() == sackId){
-                if(!sack.isFull()){
-                    System.out.println("Adding to Sack " + sackId);
-                    sack.add(present);
-                    count--;
-                    break;
-                }else{
-                    System.out.println("*** Sack " + sackId + " is FULL :: Locking Sack " + sackId + " ***");
-                    sack.getSackLock().lock();
-                }
-            }
+    private synchronized void addToSack(Sack sack, Present present) throws InterruptedException {
+        if(!sack.isFull()){
+            System.out.println("Adding to Sack " + sack.getSackId());
+            sack.add(present);
+            count--;
+        }
+        else{
+            System.out.println("*** Sack " + sack.getSackId() + " is FULL :: Locking Sack " + sack.getSackId() + " ***");
+            sack.getSackLock().lock();
+        }
+    }
+
+    //Adding a present from the turntable to another Belt
+    //////////////////////////////////////////////////////
+    private synchronized void addToBelt(Conveyor belt, Present present) throws InterruptedException {
+        if(!belt.isFull() && !belt.getConveyorLock().isLocked()){
+            System.out.println("Adding to Belt " + belt.getId());
+            belt.add(present);
+            count--;
+        }
+        else{
+            System.out.println("*** Belt " + belt.getId() + " is FULL :: Locking belt " + belt.getId() + " ***");
+            belt.getConveyorLock().lock();
         }
     }
 
     //Driver method for the Turntable from inside the Run method
     ///////////////////////////////////////////////////////////////
     private synchronized boolean runTurntable() throws InterruptedException {
+        Connection currentConnection, outputConnection;
         // Polling all connected input conveyor belts in turn
         for (int port = 0; port < 4; port++) {
-            Connection currentConnection = connections[port];
+            currentConnection = connections[port];
 
             if (currentConnection != null && currentConnection.getConnType() == ConnectionType.InputBelt) {
                 if (currentConnection.getBelt().getCount() > 0 ) {
@@ -95,9 +103,16 @@ public class Turntable extends Thread
                     long totalRotationDelay =  (Math.abs(outputPort - port) * rotationDelay);
                     Thread.sleep(totalRotationDelay);
 
+                    outputConnection = connections[outputPort];
                     //Simulating Present getting off the Turntable and into Sacks
-                    addToSack(sackId, currentPresent);
-                    Thread.sleep(presentHandlingDelay);
+                    if(outputConnection.getConnType() == ConnectionType.OutputSack){
+                        addToSack(outputConnection.getSack(), currentPresent);
+                        Thread.sleep(presentHandlingDelay);
+                    }
+                    //Simulating Present getting off the Turntable and into another belt
+                    else if(outputConnection.getConnType() == ConnectionType.OutputBelt){
+                        addToBelt(outputConnection.getBelt(), currentPresent);
+                    }
                     return true;
                 }
                 return false;
