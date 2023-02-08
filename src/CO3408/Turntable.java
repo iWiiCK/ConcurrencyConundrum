@@ -27,6 +27,8 @@ public class Turntable extends Thread
     private volatile boolean isRunning = true;
     private boolean itemsRemainingInBelt = false;
 
+    private boolean cleanUpMessageDisplayed = false;
+
     public Turntable (String ID){
         id = ID;
     }
@@ -52,13 +54,12 @@ public class Turntable extends Thread
     //////////////////////////////////////////////////////
     private synchronized void addToSack(Sack sack, Present present) throws InterruptedException {
         if(!sack.isFull()){
-            System.out.println("Adding to Sack " + sack.getSackId());
+            System.out.println("--> Table " + id + " Adding [" + present.getAgeRange() + "] Present to Sack " + sack.getSackId() + " (Age Range: [" + sack.getAgeRange() + "])");
             sack.add(present);
             count--;
         }
         else{
-            System.out.println("*** Sack " + sack.getSackId() + " is FULL :: Locking Sack " + sack.getSackId() + " ***");
-            sack.getSackLock().lock();
+            System.out.println("*** Sack " + sack.getSackId() + " is FULL :: Cannot Add Present ***");
         }
     }
 
@@ -66,12 +67,12 @@ public class Turntable extends Thread
     //////////////////////////////////////////////////////
     private synchronized void addToBelt(Conveyor belt, Present present) throws InterruptedException {
         if(!belt.isFull() && !belt.getConveyorLock().isLocked()){
-            System.out.println("Adding to Belt " + belt.getId());
+            System.out.println("--> Table " + id + " Adding to Belt " + belt.getId());
             belt.add(present);
             count--;
         }
         else{
-            System.out.println("*** Belt " + belt.getId() + " is FULL :: Locking belt " + belt.getId() + " ***");
+            System.out.println("*** Belt " + belt.getId() + " is FULL :: cannot Add Present ***");
             belt.getConveyorLock().lock();
         }
     }
@@ -86,7 +87,7 @@ public class Turntable extends Thread
 
             if (currentConnection != null && currentConnection.getConnType() == ConnectionType.InputBelt) {
                 if (currentConnection.getBelt().getCount() > 0 ) {
-                    System.out.println("Turntable " + id + " requested Present");
+                    System.out.println("Turntable " + id + " Requesting Present...");
                     Present currentPresent = currentConnection.getBelt().requestPresent();
                     count++;
                     //Simulating Present getting on the Turntable
@@ -130,12 +131,16 @@ public class Turntable extends Thread
         synchronized (this){
             while(isRunning || itemsRemainingInBelt){
                 try {
+                    if(!isRunning && !cleanUpMessageDisplayed) {
+                        System.out.println("\n-------------------------------------------------------------\nMACHINE OFFLINE :: WORKING ON PRESENTS ALREADY IN THE MACHINE\n-------------------------------------------------------------\n");
+                        cleanUpMessageDisplayed = true;
+                    };
                     itemsRemainingInBelt = runTurntable();
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             }
-            System.out.println("***  Turntable " + id + " STOPPED :: [Present Remaining :: " + count + "] ***");
+            System.out.println("### Turntable " + id + " STOPPED :: [Present Remaining :: " + count + "] ###");
         }
     }
 

@@ -11,12 +11,14 @@ public class Sack
     private final Present[] accumulation;
     private final int capacity;
     private int count = 0;
-    private final CustomLock sackLock = new CustomLock("sackLock");
+
+    private final String ageRange;
     
-    public Sack(int id, int capacity){
+    public Sack(int id, int capacity, String ageRange){
         accumulation = new Present[capacity];
         this.capacity = capacity;
         this.id = id;
+        this.ageRange = ageRange;
     }
 
     public synchronized boolean isFull(){
@@ -24,13 +26,12 @@ public class Sack
     }
 
     //Adding Presents to the Sack.
-    public synchronized void add(Present p) throws InterruptedException {
+    public synchronized void add(Present p) {
         accumulation[count] = p;
         count++;
 
         if(isFull()){
-            System.out.println("SACK " + id + " is FULL");
-            sackLock.lock();
+            System.out.println("==========[SACK " + id + " is now FULL]===========");
         }
     }
 
@@ -42,7 +43,7 @@ public class Sack
         return id;
     }
 
-    public CustomLock getSackLock() {
-        return sackLock;
+    public String getAgeRange() {
+        return ageRange;
     }
 }

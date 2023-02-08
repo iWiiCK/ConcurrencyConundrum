@@ -12,13 +12,14 @@ public class Conveyor
     private final HashSet<Integer> destinations = new HashSet<>();
     private final int size;
     private int count = 0;
-    private final CustomLock conveyorLock = new CustomLock("conveyorLock");
+    private final CustomLock conveyorLock;
     private final Utils utils = new Utils();
     
     public Conveyor(int id, int size){
         this.id = id;
         this.presents = new Present[size];
         this.size = size;
+        this.conveyorLock = new CustomLock("BELT_" + id + "_LOCK");
     }
 
     public void addDestination(int hopperID){

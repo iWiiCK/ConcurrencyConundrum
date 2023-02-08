@@ -12,8 +12,10 @@ import java.util.Scanner;
 public class Main
 {
     public static void main(String[] args) throws InterruptedException {
-        // These variables will store the configuration
-        // of the Present sorting machine
+
+        // These variables will store the configuration of the Present sorting machine
+
+        final String FILE_NAME = "scenario3.txt";
         
         int numBelts;
         Conveyor[] belts;
@@ -33,7 +35,6 @@ public class Main
         
         // READ FILE
         // =========
-        final String FILE_NAME = "scenario5.txt";
         Scanner inputStream = null;
         try{
             inputStream = new Scanner(new File("src/Scenarios/" + FILE_NAME));
@@ -130,7 +131,7 @@ public class Main
             String age = inputStream.next();
             line = inputStream.nextLine(); // skip rest of line
 
-            sacks[s] = new Sack(id, capacity);
+            sacks[s] = new Sack(id, capacity, age);
             Turntable.destinations.put(age, id);
         } // end of reading sack lines
 
@@ -322,7 +323,7 @@ public class Main
         for(Turntable table : tables){
             table.join();
         }
-        System.out.println("/////////////////////////////////////////////////////\n");
+        System.out.println();
 
         endTime = System.currentTimeMillis();
         System.out.println("/////////////////////////////////////////////////////");

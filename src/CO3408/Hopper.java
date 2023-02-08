@@ -34,7 +34,7 @@ public class Hopper extends Thread
             count++;
         }
         else{
-            System.out.println("*** Hopper " + id + " is FULL ***");
+            System.out.println("===========[Hopper " + id + " is FULL]============");
         }
     }
 
@@ -51,7 +51,7 @@ public class Hopper extends Thread
                     throw new RuntimeException(e);
                 }
             }
-            System.out.println("*** Hopper " + id + " STOPPED :: [Present Remaining :: " + count + "] ***");
+            System.out.println("### Hopper " + id + " STOPPED :: [Present Remaining :: " + count + "] ###");
         }
     }
 
@@ -60,7 +60,7 @@ public class Hopper extends Thread
     public synchronized void deposit() throws InterruptedException {
         while(count < 1){
             if(isRunning){
-                System.out.println("*** Hopper " + id + " is EMPTY ***");
+                System.out.println("===========[Hopper " + id + " is EMPTY]===========");
                 hopperEmptiedTimestamp = System.currentTimeMillis();
                 wait();
             }else{
@@ -69,7 +69,7 @@ public class Hopper extends Thread
         }
 
         if(!belt.isFull() && isRunning){
-            System.out.println("Hopper "+ id + " DEPOSITING :: Remaining [" + count + "]");
+            System.out.println("::: Hopper "+ id + " DEPOSITING :: Remaining [" + count + "]");
             //Assuming speed is the deposit speed in seconds.
             // Ex: Speed 1 = presents are deposited every 1 second.
             sleep(speed * 1000L);
