@@ -33,6 +33,7 @@ public class Main
         Turntable[] tables;
 
         int timerLength;
+        int numPresents = 0;
 
         ////////////////////////////////////////////////////////////////////////
         
@@ -237,7 +238,7 @@ public class Main
                 line = inputStream.nextLine();
             }
 
-            int numPresents = inputStream.nextInt();
+            numPresents = inputStream.nextInt();
             inputStream.nextLine();
 
             for (int p = 0; p < numPresents; p++){
@@ -266,13 +267,14 @@ public class Main
         
         
         // START the hoppers!
-        for (int h = 0; h < numHoppers; h++){
-            hoppers[h].start();
+        for (Hopper hopper : hoppers){
+            hopper.start();
         }
 
         // START the turntables!
-        for (int t = 0; t < numTurntables; t++){
-            tables[t].start();
+        for (Turntable table : tables){
+            table.setMaxAccumulation(numPresents);
+            table.start();
         }
 
         long time = 0;
@@ -343,8 +345,42 @@ public class Main
         
         int giftsDeposited = Utils.countGiftsDeposited(hoppers);
         
-        for (int h = 0; h < numHoppers; h++){
-            System.out.println("Hopper " + hoppers[h].getHopperId() + " deposited " +giftsDeposited + " presents and waited " + (endTime - hoppers[h].getHopperEmptiedTimestamp())/1000 + "s.");
+        for (Hopper hopper : hoppers){
+            System.out.println("Hopper " + hopper.getHopperId() + " deposited " + hopper.getDepositCount() + " presents and waited " + (endTime - hopper.getHopperEmptiedTimestamp())/1000 + "s.");
+        }
+
+        for (Sack sack : sacks){
+            System.out.println("Sack " + sack.getSackId() + "(Age Range: [" + sack.getAgeRange() + "]) is " + sack.getCount() + "/" + sack.getCapacity() + " Filled with Presents");
+            if(sack.getCount() > 0 ){
+                System.out.println("Present...");
+                for (Present present : sack.getAccumulation()){
+                    if(present != null)
+                        System.out.println(present.getAgeRange());
+                }
+            }
+        }
+
+        for (Turntable table : tables){
+            System.out.println("Table " + table.getTableId() + " has " + table.getCount() + " Presents on it");
+
+            if(table.getCount() > 0){
+                System.out.println("Present Left...");
+                for (Present present : table.getAccumulation()){
+                    if(present != null)
+                        System.out.println(present.getAgeRange());
+                }
+            }
+        }
+
+        for (Conveyor belt : belts){
+            System.out.println("Belt " + belt.getId() + " has " + belt.getCount() + " Presents on it");
+
+            if(belt.getCount() > 0){
+                System.out.println("Present Left...");
+                for (Present present : belt.getPresents()){
+                    System.out.println(present.getAgeRange());
+                }
+            }
         }
 
         System.out.println();

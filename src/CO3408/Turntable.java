@@ -26,6 +26,8 @@ public class Turntable extends Thread
     private int count = 0;
     private volatile boolean isRunning = true;
     private boolean itemsRemainingInBelt = false;
+    private Present[] accumulation;
+    private final Utils utils = new Utils();
 
     public Turntable (String ID){
         id = ID;
@@ -54,6 +56,7 @@ public class Turntable extends Thread
         if(!sack.isFull()){
             System.out.println("--> Table " + id + " Adding [" + present.getAgeRange() + "] Present to Sack " + sack.getSackId() + " (Age Range: [" + sack.getAgeRange() + "])");
             sack.add(present);
+            accumulation = utils.popFirstAndReArrange(accumulation);
             count--;
         }
         else{
@@ -67,6 +70,7 @@ public class Turntable extends Thread
         if(!belt.isFull() && !belt.getConveyorLock().isLocked()){
             System.out.println("--> Table " + id + " Adding to Belt " + belt.getId());
             belt.add(present);
+            accumulation = utils.popFirstAndReArrange(accumulation);
             count--;
         }
         else{
@@ -87,6 +91,7 @@ public class Turntable extends Thread
                 if (currentConnection.getBelt().getCount() > 0 ) {
                     System.out.println("Turntable " + id + " Requesting Present...");
                     Present currentPresent = currentConnection.getBelt().requestPresent();
+                    accumulation[count] = currentPresent;
                     count++;
                     //Simulating Present getting on the Turntable
                     long presentHandlingDelay = (long) (0.75 * 1000);
@@ -146,5 +151,17 @@ public class Turntable extends Thread
 
     public int getCount() {
         return count;
+    }
+
+    public String getTableId() {
+        return id;
+    }
+
+    public void setMaxAccumulation(int maxAccumulation) {
+        this.accumulation = new Present[maxAccumulation];
+    }
+
+    public Present[] getAccumulation() {
+        return accumulation;
     }
 }

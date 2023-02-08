@@ -11,7 +11,6 @@ public class Sack
     private final Present[] accumulation;
     private final int capacity;
     private int count = 0;
-
     private final String ageRange;
     
     public Sack(int id, int capacity, String ageRange){
@@ -45,5 +44,13 @@ public class Sack
 
     public String getAgeRange() {
         return ageRange;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public Present[] getAccumulation() {
+        return accumulation;
     }
 }

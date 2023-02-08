@@ -65,4 +65,8 @@ public class Conveyor
     public int getId() {
         return id;
     }
+
+    public Present[] getPresents() {
+        return presents;
+    }
 }
