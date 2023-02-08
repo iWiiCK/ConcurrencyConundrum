@@ -315,12 +315,14 @@ public class Main
         }
 
         // Wait for everything to finish...
+        System.out.println();
         for(Hopper hopper : hoppers){
             hopper.join();
         }
         for(Turntable table : tables){
             table.join();
         }
+        System.out.println("/////////////////////////////////////////////////////\n");
 
         endTime = System.currentTimeMillis();
         System.out.println("/////////////////////////////////////////////////////");
@@ -333,7 +335,7 @@ public class Main
         System.out.println("\nFINAL REPORT");
         System.out.println("-----------------------------------------\n");
         System.out.println("Configuration: " + FILE_NAME);
-        System.out.println("Total Run Time" + (endTime - startTime) / 1000 + "s.");
+        System.out.println("Total Run Time: " + (endTime - startTime) / 1000 + "s.");
         
         int giftsDeposited = Utils.countGiftsDeposited(hoppers);
         
