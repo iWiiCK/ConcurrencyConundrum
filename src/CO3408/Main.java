@@ -33,7 +33,7 @@ public class Main
         
         // READ FILE
         // =========
-        final String FILE_NAME = "scenario5.txt";
+        final String FILE_NAME = "scenario1.txt";
         Scanner inputStream = null;
         try{
             inputStream = new Scanner(new File("src/Scenarios/" + FILE_NAME));
