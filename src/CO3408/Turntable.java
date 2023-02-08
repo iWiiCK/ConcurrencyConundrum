@@ -27,8 +27,6 @@ public class Turntable extends Thread
     private volatile boolean isRunning = true;
     private boolean itemsRemainingInBelt = false;
 
-    private boolean cleanUpMessageDisplayed = false;
-
     public Turntable (String ID){
         id = ID;
     }
@@ -131,10 +129,6 @@ public class Turntable extends Thread
         synchronized (this){
             while(isRunning || itemsRemainingInBelt){
                 try {
-                    if(!isRunning && !cleanUpMessageDisplayed) {
-                        System.out.println("\n-------------------------------------------------------------\nMACHINE OFFLINE :: WORKING ON PRESENTS ALREADY IN THE MACHINE\n-------------------------------------------------------------\n");
-                        cleanUpMessageDisplayed = true;
-                    };
                     itemsRemainingInBelt = runTurntable();
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
