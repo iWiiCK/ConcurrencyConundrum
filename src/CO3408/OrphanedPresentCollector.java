@@ -2,7 +2,6 @@ package CO3408;
 /**
  *  @author Heshan Wickramaratne.
  *
- *
  *  The 'OrphanedPresentCollector' class is used to collect all Orphaned presents.
  *  - Orphanced presents in this context are Presents that are in the machine but where the destination sack is FULL!.
  *  - This is used so that the Turntable does not get filled with these presents.

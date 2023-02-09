@@ -1,5 +1,6 @@
 package CO3408;
 
+import java.util.HashMap;
 import java.util.HashSet;
 /**
  *
@@ -16,12 +17,14 @@ public class Conveyor
     private int count = 0;
     // The requirements say this must be a fixed size array
     private Present[] presents;
+    private final HashMap<Integer, Integer> beltPresentCountChecker;
     
-    public Conveyor(int id, int size){
+    public Conveyor(int id, int size, HashMap<Integer, Integer> beltPresentCountChecker){
         this.id = id;
         this.presents = new Present[size];
         this.size = size;
         this.conveyorLock = new CustomLock("BELT_" + id + "_LOCK");
+        this.beltPresentCountChecker = beltPresentCountChecker;
     }
 
     // Method for adding destinations
@@ -41,6 +44,7 @@ public class Conveyor
     public synchronized void add(Present p ) throws InterruptedException {
         presents[count] = p;
         count++;
+        beltPresentCountChecker.put(id, count);
         System.out.println("Presents on Belt " + id + " :: "+ count);
 
         if(count == size){
@@ -54,8 +58,16 @@ public class Conveyor
         Present earliestPresent = presents[0];
         presents = utils.popFirstAndReArrange(presents);
         count--;
+        beltPresentCountChecker.put(id, count);
         conveyorLock.unlock();
         return earliestPresent;
+    }
+
+    // A method for the Turntable to query what the next present inline is for it
+    // This allows it to use the 'requestPresent' method ONLY when it's output port is open
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    public synchronized Present queryPresent(){
+        return presents[0];
     }
 
     // Getters
