@@ -3,6 +3,8 @@ package CO3408;
 import java.io.File;
 import java.io.FileNotFoundException;
 import static java.lang.Thread.sleep;
+
+import java.util.HashMap;
 import java.util.Scanner;
 
 /**
@@ -35,6 +37,10 @@ public class Main
 
         int numTurntables;
         Turntable[] tables;
+
+        //Shared maps between all the Tables and Belts to keep track of Presents currently in the system.
+        HashMap<Integer, Integer> beltPresentCountChecker = new HashMap<>();
+        HashMap<String, Integer> tablePresentCountChecker = new HashMap<>();
 
         int timerLength;
         int numPresents = 0;
@@ -73,7 +79,7 @@ public class Main
             beltStream.next(); // skip "length"
 
             int length = beltStream.nextInt();
-            belts[b] = new Conveyor(id, length);
+            belts[b] = new Conveyor(id, length, beltPresentCountChecker);
             beltStream.next(); // skip "destinations"
 
             while (beltStream.hasNextInt()){
@@ -158,7 +164,7 @@ public class Main
             // Each turntable line will look like this:
             // A N ib 1 E null S os 1 W null
             String tableId = inputStream.next();
-            tables[t] = new Turntable(tableId, orphanedPresentCollector);
+            tables[t] = new Turntable(tableId, orphanedPresentCollector, beltPresentCountChecker, tablePresentCountChecker);
 
             int connId;
 
