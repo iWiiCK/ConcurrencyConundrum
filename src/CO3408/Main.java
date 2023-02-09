@@ -12,9 +12,18 @@ import java.util.Scanner;
 public class Main
 {
     public static void main(String[] args) throws InterruptedException {
-        // These variables will store the configuration
-        // of the Present sorting machine
-        
+
+        // Taking the Scenario Number as a User input.
+        Scanner input = new Scanner(System.in);
+        System.out.print("\nEnter Scenario Number: > ");
+        String scenarioNum = input.nextLine();
+        final String FILE_NAME = "scenario" + scenarioNum + ".txt";
+
+        // Changing this to false will display the default Final Report logs.
+        // I have added more to see exactly what has happened in the Report :)
+        final boolean DISPLAY_EXTENDED_REPORT = true;
+
+        // These variables will store the configuration of the Present sorting machine
         int numBelts;
         Conveyor[] belts;
 
@@ -28,12 +37,12 @@ public class Main
         Turntable[] tables;
 
         int timerLength;
+        int numPresents = 0;
 
         ////////////////////////////////////////////////////////////////////////
-        
         // READ FILE
-        // =========
-        final String FILE_NAME = "scenario1.txt";
+        ////////////////////////////////////////////////////////////////////////
+
         Scanner inputStream = null;
         try{
             inputStream = new Scanner(new File("src/Scenarios/" + FILE_NAME));
@@ -46,7 +55,6 @@ public class Main
         String line = "";
 
         // READ BELTS
-        // ----------
         // Skip though any blank lines to start
         while (!line.startsWith("BELTS") && inputStream.hasNextLine()){
             line = inputStream.nextLine();
@@ -75,7 +83,6 @@ public class Main
         } // end of reading belt lines
 
         // READ HOPPERS
-        // ------------
         // Skip though any blank lines
         while (!line.startsWith("HOPPERS") && inputStream.hasNextLine()){
             line = inputStream.nextLine();
@@ -106,7 +113,6 @@ public class Main
         } // end of reading hopper lines
 
         // READ SACKS
-        // ------------
         // Skip though any blank lines
         while (!line.startsWith("SACKS") && inputStream.hasNextLine()){
             line = inputStream.nextLine();
@@ -130,12 +136,14 @@ public class Main
             String age = inputStream.next();
             line = inputStream.nextLine(); // skip rest of line
 
-            sacks[s] = new Sack(id, capacity);
+            sacks[s] = new Sack(id, capacity, age);
             Turntable.destinations.put(age, id);
         } // end of reading sack lines
 
+        // Orphaned Collector collects gift moving towards a FULL sack in the machine .
+        OrphanedPresentCollector orphanedPresentCollector = new OrphanedPresentCollector(sacks);
+
         // READ TURNTABLES
-        // ---------------
         // Skip though any blank lines
         while (!line.startsWith("TURNTABLES") && inputStream.hasNextLine()){
             line = inputStream.nextLine();
@@ -149,9 +157,8 @@ public class Main
         for (int t = 0; t < numTurntables; t++){
             // Each turntable line will look like this:
             // A N ib 1 E null S os 1 W null
-
             String tableId = inputStream.next();
-            tables[t] = new Turntable(tableId, sacks);
+            tables[t] = new Turntable(tableId, orphanedPresentCollector);
 
             int connId;
 
@@ -226,14 +233,13 @@ public class Main
         } // end of reading turntable lines
 
         // FILL THE HOPPERS
-        // ----------------
         for (int i = 0; i < numHoppers; i++){
             // Skip though any blank lines
             while (!line.startsWith("PRESENTS") && inputStream.hasNextLine()){
                 line = inputStream.nextLine();
             }
 
-            int numPresents = inputStream.nextInt();
+            numPresents = inputStream.nextInt();
             inputStream.nextLine();
 
             for (int p = 0; p < numPresents; p++){
@@ -243,7 +249,6 @@ public class Main
         }
 
         // READ TIMER LENGTH
-        // -----------------
         // Skip though any blank lines
         while (!line.startsWith("TIMER") && inputStream.hasNextLine()){
             line = inputStream.nextLine();
@@ -259,16 +264,18 @@ public class Main
         ///////////////////////////////////////////////////////////////////////
         // END OF SETUP ///////////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////////////////
-        
-        
+
+        // Setting the max size of the Orphan collector to the num of presents.
+        orphanedPresentCollector.setMaxAccumulation(numPresents);
+
         // START the hoppers!
-        for (int h = 0; h < numHoppers; h++){
-            hoppers[h].start();
+        for (Hopper hopper : hoppers){
+            hopper.start();
         }
 
         // START the turntables!
-        for (int t = 0; t < numTurntables; t++){
-            tables[t].start();
+        for (Turntable table : tables){
+            table.start();
         }
 
         long time = 0;
@@ -305,11 +312,11 @@ public class Main
         System.out.println("*** Input Stopped after " + (endTime - startTime) / 1000 + "s. ***");
         System.out.println("/////////////////////////////////////////////////////");
 
-        // Stop the hoppers!
+        // STOP the hoppers!
         for(Hopper hopper : hoppers){
             hopper.stopHopper();
         }
-        // Stop the tables!
+        // STOP the tables!
         for(Turntable table : tables){
             table.stopTurntable();
         }
@@ -322,7 +329,7 @@ public class Main
         for(Turntable table : tables){
             table.join();
         }
-        System.out.println("/////////////////////////////////////////////////////\n");
+        System.out.println();
 
         endTime = System.currentTimeMillis();
         System.out.println("/////////////////////////////////////////////////////");
@@ -331,28 +338,11 @@ public class Main
         
         // FINAL REPORTING
         ////////////////////////////////////////////////////////////////////////
-
         System.out.println("\nFINAL REPORT");
         System.out.println("-----------------------------------------\n");
         System.out.println("Configuration: " + FILE_NAME);
         System.out.println("Total Run Time: " + (endTime - startTime) / 1000 + "s.");
-        
-        int giftsDeposited = Utils.countGiftsDeposited(hoppers);
-        
-        for (int h = 0; h < numHoppers; h++){
-            System.out.println("Hopper " + hoppers[h].getHopperId() + " deposited " +giftsDeposited + " presents and waited " + (endTime - hoppers[h].getHopperEmptiedTimestamp())/1000 + "s.");
-        }
-
-        System.out.println();
-
-        int giftsOnMachine = Utils.countGiftsIn(tables) + Utils.countGiftsIn(belts);
-        int giftsInSacks = Utils.countGiftsIn(sacks);
-        
-        System.out.print("\nOut of " + giftsDeposited + " gifts deposited, ");
-        System.out.print(giftsOnMachine + " are still on the machine, and ");
-        System.out.println(giftsInSacks + " made it into the sacks");
-
-        int missing = giftsDeposited - giftsInSacks - giftsOnMachine;
-        System.out.println(missing + " gifts went missing.");
+        // Display Report based on params.
+        Utils.displayReport(DISPLAY_EXTENDED_REPORT, endTime, hoppers, sacks, tables, belts, orphanedPresentCollector);
     }
 }
