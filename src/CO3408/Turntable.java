@@ -133,9 +133,7 @@ public class Turntable extends Thread
                     }
                     return true;
                 }
-                return false;
             }
-            return false;
         }
         return false;
     }
