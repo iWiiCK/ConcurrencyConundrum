@@ -25,11 +25,11 @@ public class Turntable extends Thread
     private final int portCount = 4;
     private final Present[] accumulation = new Present[portCount];
     private final OrphanedPresentCollector orphanedPresentCollector;
+    private final HashMap<Integer, Integer> beltPresentCountChecker;
+    private final HashMap<String, Integer> tablePresentCountChecker;
     // Count of Presents on the Table.
     private int count = 0;
     private boolean itemsRemainingInBelt = false;
-    private final HashMap<Integer, Integer> beltPresentCountChecker;
-    private final HashMap<String, Integer> tablePresentCountChecker;
 
     public Turntable (String ID, OrphanedPresentCollector orphanedPresentCollector, HashMap<Integer, Integer> beltPresentCountChecker, HashMap<String, Integer> tablePresentCountChecker){
         id = ID;

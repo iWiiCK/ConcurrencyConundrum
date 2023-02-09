@@ -13,11 +13,11 @@ public class Conveyor
     private final CustomLock conveyorLock;
     private final Utils utils = new Utils();
     private final int size;
+    private final HashMap<Integer, Integer> beltPresentCountChecker;
     // Count of presents on the belt
     private int count = 0;
     // The requirements say this must be a fixed size array
     private Present[] presents;
-    private final HashMap<Integer, Integer> beltPresentCountChecker;
     
     public Conveyor(int id, int size, HashMap<Integer, Integer> beltPresentCountChecker){
         this.id = id;

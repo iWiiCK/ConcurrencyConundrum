@@ -303,14 +303,14 @@ public class Main
 
             currentTime = System.currentTimeMillis();
             time = (currentTime - startTime) / 1000;
-            System.out.println("\n=====================================================");
+            System.out.println("\n=========================================================================================================");
             System.out.println("Interim Report @ " + time + "s:");
 
             int giftsInSacks = Utils.countGiftsIn(sacks);
             int giftsInHoppers = Utils.countGiftsIn(hoppers);
             
             System.out.println(giftsInHoppers + " presents remaining in hoppers;\n" + giftsInSacks + " presents sorted into sacks.");
-            System.out.println("=====================================================\n");
+            System.out.println("=========================================================================================================\n");
 
         }
         long endTime = System.currentTimeMillis();
@@ -322,10 +322,15 @@ public class Main
         for(Hopper hopper : hoppers){
             hopper.stopHopper();
         }
+
         // STOP the tables!
         for(Turntable table : tables){
             table.stopTurntable();
         }
+
+        System.out.println("\n=========================================================================================================\n" +
+                " MACHINE CLEANUP RUNNING :: Tables will shutdown after\n" +
+                "=========================================================================================================");
 
         // Wait for everything to finish...
         System.out.println();
