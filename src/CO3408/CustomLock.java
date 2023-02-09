@@ -12,7 +12,8 @@ public class CustomLock
     ///////////////////////////
     public synchronized void lock() throws InterruptedException {
         if(!locked){
-            System.out.println("-----------------------------------------\n--------  " + id + " :: LOCKED  --------\n-----------------------------------------");
+            System.out.println("-----------------------------------------\n--------  " +
+                    id + " :: LOCKED  --------\n-----------------------------------------");
             while (locked) {
                 wait();
             }
@@ -24,7 +25,8 @@ public class CustomLock
     ///////////////////////////
     public synchronized void unlock() {
         if(locked){
-            System.out.println("-----------------------------------------\n-------- " + id + " :: UNLOCKED --------\n-----------------------------------------");
+            System.out.println("-----------------------------------------\n-------- " +
+                    id + " :: UNLOCKED --------\n-----------------------------------------");
             locked = false;
             notifyAll();
         }

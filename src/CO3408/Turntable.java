@@ -25,13 +25,35 @@ public class Turntable extends Thread
     private final int portCount = 4;
     private final Present[] accumulation = new Present[portCount];
     private final OrphanedPresentCollector orphanedPresentCollector;
+    private final HashMap<Integer, Integer> beltPresentCountChecker;
+    private final HashMap<String, Integer> tablePresentCountChecker;
     // Count of Presents on the Table.
     private int count = 0;
     private boolean itemsRemainingInBelt = false;
 
-    public Turntable (String ID, OrphanedPresentCollector orphanedPresentCollector){
+    public Turntable (String ID, OrphanedPresentCollector orphanedPresentCollector, HashMap<Integer, Integer> beltPresentCountChecker, HashMap<String, Integer> tablePresentCountChecker){
         id = ID;
         this.orphanedPresentCollector = orphanedPresentCollector;
+        this.beltPresentCountChecker = beltPresentCountChecker;
+        this.tablePresentCountChecker = tablePresentCountChecker;
+    }
+
+    /**
+     * Thread Run Method
+     * ////////////////////////////////////////////////
+     * */
+    public void run(){
+        synchronized (this){
+            //Run while 'isRunning' or when there are still items on the belts.
+            while(isRunning || itemsRemainingInBelt || !canShutdown()){
+                try {
+                    itemsRemainingInBelt = runTurntable();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            System.out.println("### Turntable " + id + " STOPPED :: [Present Remaining :: " + count + "] ###");
+        }
     }
 
     // Creating table port connections
@@ -61,6 +83,7 @@ public class Turntable extends Thread
             sack.add(present);
             accumulation[outputPort] = null;
             count--;
+            tablePresentCountChecker.put(id, count);
         }
         else{
             System.out.println("*** Sack " + sack.getSackId() + " is FULL :: Cannot Add Present ***");
@@ -75,6 +98,7 @@ public class Turntable extends Thread
             belt.add(present);
             accumulation[outputPort] = null;
             count--;
+            tablePresentCountChecker.put(id, count);
         }
         else{
             System.out.println("*** Belt " + belt.getId() + " is FULL :: cannot Add Present ***");
@@ -91,11 +115,12 @@ public class Turntable extends Thread
             currentConnection = connections[port];
 
             if (currentConnection != null && currentConnection.getConnType() == ConnectionType.InputBelt && accumulation[port] == null) {
-                if (currentConnection.getBelt().getCount() > 0) {
+                if (currentConnection.getBelt().getCount() > 0 && canRequestPresent(currentConnection.getBelt().queryPresent())) {
                     System.out.println("Turntable " + id + " Requesting Present...");
                     Present currentPresent = currentConnection.getBelt().requestPresent();
                     accumulation[port] = currentPresent;
                     count++;
+                    tablePresentCountChecker.put(id, count);
                     //Simulating Present getting on the Turntable
                     long presentHandlingDelay = (long) (0.75 * 1000);
                     Thread.sleep(presentHandlingDelay);
@@ -138,22 +163,37 @@ public class Turntable extends Thread
         return false;
     }
 
-    /**
-     * Thread Run Method
-     * ////////////////////////////////////////////////
-     * */
-    public void run(){
-        synchronized (this){
-            //Run while 'isRunning' or when there are still items on the belts.
-            while(isRunning || itemsRemainingInBelt){
-                try {
-                    itemsRemainingInBelt = runTurntable();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            System.out.println("### Turntable " + id + " STOPPED :: [Present Remaining :: " + count + "] ###");
+    //Method to check whether the turntable can request a present
+    /////////////////////////////////////////////////////////////////
+    private boolean canRequestPresent(Present present){
+        String ageRange = present.getAgeRange();
+        int sackId = destinations.get(ageRange);
+        int outputPort = outputMap.get(sackId);
+
+        Connection outputConnection = connections[outputPort];
+        if(outputConnection.getConnType() == ConnectionType.OutputSack){
+            return true;
         }
+        else if(outputConnection.getConnType() == ConnectionType.OutputBelt){
+            Conveyor belt = outputConnection.getBelt();
+            return !belt.isFull();
+        }
+        return true;
+    }
+
+    //Check whether the turnrable could be Shutdown.
+    // If not presents exist in the maschine, then all the Turntables can be Shutdowned.
+    /////////////////////////////////////////////////////////////////////////////////////
+    private boolean canShutdown(){
+        for (HashMap.Entry<Integer, Integer> belt : beltPresentCountChecker.entrySet()){
+            if(belt.getValue() > 0) return false;
+        }
+
+        for (HashMap.Entry<String, Integer> table : tablePresentCountChecker.entrySet()){
+            if(table.getValue() > 0) return false;
+        }
+
+        return true;
     }
 
     // Used to Stop the Thread ones the Time is up for the Simulation
