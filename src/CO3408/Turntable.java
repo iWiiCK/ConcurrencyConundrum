@@ -10,29 +10,32 @@ import java.util.*;
  */
 public class Turntable extends Thread
 {
-    private final String id;
+    private volatile boolean isRunning = true;
     static int N = 0;
     static int E = 1;
     static int S = 2;
     static int W = 3;
-    private final Connection[] connections = new Connection[4];
     // global lookup: age-range -> SackID
     static HashMap<String, Integer> destinations = new HashMap<>();
+    private final String id;
+    private final Connection[] connections = new Connection[4];
     // this individual table's lookup: SackID -> output port
     private final HashMap<Integer, Integer> outputMap = new HashMap<>();
-    private int count = 0;
-    private volatile boolean isRunning = true;
-    private boolean itemsRemainingInBelt = false;
-    //Max accumulation can be 4 for the 4 ports
-    private Present[] accumulation = new Present[4];
-    private final Utils utils = new Utils();
+    // Max accumulation can be 4 for the 4 ports
+    private final int portCount = 4;
+    private final Present[] accumulation = new Present[portCount];
     private final OrphanedPresentCollector orphanedPresentCollector;
+    // Count of Presents on the Table.
+    private int count = 0;
+    private boolean itemsRemainingInBelt = false;
 
     public Turntable (String ID, OrphanedPresentCollector orphanedPresentCollector){
         id = ID;
         this.orphanedPresentCollector = orphanedPresentCollector;
     }
 
+    // Creating table port connections
+    /////////////////////////////////////
     public void addConnection(int port, Connection conn){
         connections[port] = conn;
         
@@ -50,9 +53,9 @@ public class Turntable extends Thread
         }
     }
 
-    //Adding a present from the turntable to a Sack
+    // Adding a present from the turntable to a Sack
     //////////////////////////////////////////////////////
-    private void addToSack(Sack sack, Present present, int outputPort) throws InterruptedException {
+    private void addToSack(Sack sack, Present present, int outputPort) {
         if(!sack.isFull()){
             System.out.println("--> Table " + id + " Adding [" + present.getAgeRange() + "] Present to Sack " + sack.getSackId() + " (Age Range: [" + sack.getAgeRange() + "])");
             sack.add(present);
@@ -64,8 +67,8 @@ public class Turntable extends Thread
         }
     }
 
-    //Adding a present from the turntable to another Belt
-    //////////////////////////////////////////////////////
+    // Adding a present from the turntable to another Belt
+    ////////////////////////////////////////////////////////
     private void addToBelt(Conveyor belt, Present present, int outputPort) throws InterruptedException {
         if(!belt.isFull() && !belt.getConveyorLock().isLocked()){
             System.out.println("--> Table " + id + " Adding to Belt " + belt.getId());
@@ -79,12 +82,12 @@ public class Turntable extends Thread
         }
     }
 
-    //Driver method for the Turntable from inside the Run method
+    // Driver method for the Turntable from inside the Run method
     ///////////////////////////////////////////////////////////////
     private synchronized boolean runTurntable() throws InterruptedException {
         Connection currentConnection, outputConnection;
         // Polling all connected input conveyor belts in turn
-        for (int port = 0; port < 4; port++) {
+        for (int port = 0; port < portCount; port++) {
             currentConnection = connections[port];
 
             if (currentConnection != null && currentConnection.getConnType() == ConnectionType.InputBelt && accumulation[port] == null) {
@@ -143,6 +146,7 @@ public class Turntable extends Thread
      * */
     public void run(){
         synchronized (this){
+            //Run while 'isRunning' or when there are still items on the belts.
             while(isRunning || itemsRemainingInBelt){
                 try {
                     itemsRemainingInBelt = runTurntable();
@@ -154,12 +158,14 @@ public class Turntable extends Thread
         }
     }
 
-    //Used to Stop the Thread ones the Time is up for the Simulation
+    // Used to Stop the Thread ones the Time is up for the Simulation
     ////////////////////////////////////////////////////////////////////
     public void stopTurntable(){
         isRunning = false;
     }
 
+    // Getters
+    /////////////
     public int getCount() {
         return count;
     }

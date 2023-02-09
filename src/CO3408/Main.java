@@ -13,14 +13,17 @@ public class Main
 {
     public static void main(String[] args) throws InterruptedException {
 
+        // Taking the Scenario Number as a User input.
         Scanner input = new Scanner(System.in);
-        System.out.print("\nEnter Scenario Number(1-5): > ");
+        System.out.print("\nEnter Scenario Number: > ");
         String scenarioNum = input.nextLine();
-        // These variables will store the configuration of the Present sorting machine
-
         final String FILE_NAME = "scenario" + scenarioNum + ".txt";
+
+        // Changing this to false will display the default Final Report logs.
+        // I have added more to see exactly what has happened in the Report :)
         final boolean DISPLAY_EXTENDED_REPORT = true;
-        
+
+        // These variables will store the configuration of the Present sorting machine
         int numBelts;
         Conveyor[] belts;
 
@@ -37,9 +40,9 @@ public class Main
         int numPresents = 0;
 
         ////////////////////////////////////////////////////////////////////////
-        
         // READ FILE
-        // =========
+        ////////////////////////////////////////////////////////////////////////
+
         Scanner inputStream = null;
         try{
             inputStream = new Scanner(new File("src/Scenarios/" + FILE_NAME));
@@ -52,7 +55,6 @@ public class Main
         String line = "";
 
         // READ BELTS
-        // ----------
         // Skip though any blank lines to start
         while (!line.startsWith("BELTS") && inputStream.hasNextLine()){
             line = inputStream.nextLine();
@@ -81,7 +83,6 @@ public class Main
         } // end of reading belt lines
 
         // READ HOPPERS
-        // ------------
         // Skip though any blank lines
         while (!line.startsWith("HOPPERS") && inputStream.hasNextLine()){
             line = inputStream.nextLine();
@@ -112,7 +113,6 @@ public class Main
         } // end of reading hopper lines
 
         // READ SACKS
-        // ------------
         // Skip though any blank lines
         while (!line.startsWith("SACKS") && inputStream.hasNextLine()){
             line = inputStream.nextLine();
@@ -140,10 +140,10 @@ public class Main
             Turntable.destinations.put(age, id);
         } // end of reading sack lines
 
+        // Orphaned Collector collects gift moving towards a FULL sack in the machine .
         OrphanedPresentCollector orphanedPresentCollector = new OrphanedPresentCollector(sacks);
 
         // READ TURNTABLES
-        // ---------------
         // Skip though any blank lines
         while (!line.startsWith("TURNTABLES") && inputStream.hasNextLine()){
             line = inputStream.nextLine();
@@ -157,7 +157,6 @@ public class Main
         for (int t = 0; t < numTurntables; t++){
             // Each turntable line will look like this:
             // A N ib 1 E null S os 1 W null
-
             String tableId = inputStream.next();
             tables[t] = new Turntable(tableId, orphanedPresentCollector);
 
@@ -234,7 +233,6 @@ public class Main
         } // end of reading turntable lines
 
         // FILL THE HOPPERS
-        // ----------------
         for (int i = 0; i < numHoppers; i++){
             // Skip though any blank lines
             while (!line.startsWith("PRESENTS") && inputStream.hasNextLine()){
@@ -251,7 +249,6 @@ public class Main
         }
 
         // READ TIMER LENGTH
-        // -----------------
         // Skip though any blank lines
         while (!line.startsWith("TIMER") && inputStream.hasNextLine()){
             line = inputStream.nextLine();
@@ -267,7 +264,8 @@ public class Main
         ///////////////////////////////////////////////////////////////////////
         // END OF SETUP ///////////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////////////////
-        
+
+        // Setting the max size of the Orphan collector to the num of presents.
         orphanedPresentCollector.setMaxAccumulation(numPresents);
 
         // START the hoppers!
@@ -344,6 +342,7 @@ public class Main
         System.out.println("-----------------------------------------\n");
         System.out.println("Configuration: " + FILE_NAME);
         System.out.println("Total Run Time: " + (endTime - startTime) / 1000 + "s.");
+        // Display Report based on params.
         Utils.displayReport(DISPLAY_EXTENDED_REPORT, endTime, hoppers, sacks, tables, belts, orphanedPresentCollector);
     }
 }

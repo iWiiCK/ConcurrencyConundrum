@@ -1,7 +1,13 @@
 package CO3408;
-
+/**
+ * @author Heshan Wickramaratne.
+ *
+ * This class contains utility functions used from the main method.
+ * */
 public class Utils
 {
+    // Generic method for ordering arrays with FIFO functionalities.
+    /////////////////////////////////////////////////////////////////
     public synchronized <T> T[] popFirstAndReArrange(T[] collection){
         for (int i = 0; i < collection.length -1 ; i++){
             collection[i] = collection[i+1];
@@ -74,6 +80,7 @@ public class Utils
             System.out.println("Hopper " + hopper.getHopperId() + " deposited " + hopper.getDepositCount() + " presents and waited " + (endTime - hopper.getHopperEmptiedTimestamp())/1000 + "s.");
         }
 
+        // Displaying the extended report sections.
         if(isExtednedReport){
             for (Sack sack : sacks){
                 System.out.println("Sack " + sack.getSackId() + "(Age Range: [" + sack.getAgeRange() + "]) is " + sack.getCount() + "/" + sack.getCapacity() + " Filled with Presents");
@@ -113,7 +120,7 @@ public class Utils
                     System.out.println(present.getAgeRange());
                 }
             }
-        }
+        }// End of Extended report.
 
         System.out.println();
 

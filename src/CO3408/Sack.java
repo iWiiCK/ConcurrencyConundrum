@@ -1,4 +1,3 @@
-
 package CO3408;
 
 /**
@@ -10,8 +9,8 @@ public class Sack
     private final int id;
     private final Present[] accumulation;
     private final int capacity;
-    private int count = 0;
     private final String ageRange;
+    private int count = 0;
     
     public Sack(int id, int capacity, String ageRange){
         accumulation = new Present[capacity];
@@ -20,11 +19,8 @@ public class Sack
         this.ageRange = ageRange;
     }
 
-    public synchronized boolean isFull(){
-        return count == capacity;
-    }
-
-    //Adding Presents to the Sack.
+    // Adding Presents to the Sack.
+    ////////////////////////////////
     public synchronized void add(Present p) {
         accumulation[count] = p;
         count++;
@@ -34,6 +30,14 @@ public class Sack
         }
     }
 
+    // Method for checking whether the Sack is full or not
+    ////////////////////////////////////////////////////////
+    public synchronized boolean isFull(){
+        return count == capacity;
+    }
+
+    // Getters
+    ////////////
     public int getCount(){
         return count;
     }

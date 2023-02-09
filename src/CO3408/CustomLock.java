@@ -4,12 +4,12 @@ public class CustomLock
 {
     private final String id;
     private boolean locked = false;
-    private final Object lock = new Object();
-
     public CustomLock(String id) {
         this.id = id;
     }
 
+    // Custom lock method
+    ///////////////////////////
     public synchronized void lock() throws InterruptedException {
         if(!locked){
             System.out.println("-----------------------------------------\n--------  " + id + " :: LOCKED  --------\n-----------------------------------------");
@@ -20,6 +20,8 @@ public class CustomLock
         }
     }
 
+    // Custom Unlock method
+    ///////////////////////////
     public synchronized void unlock() {
         if(locked){
             System.out.println("-----------------------------------------\n-------- " + id + " :: UNLOCKED --------\n-----------------------------------------");
@@ -30,9 +32,5 @@ public class CustomLock
 
     public boolean isLocked() {
         return locked;
-    }
-
-    public Object getLock() {
-        return lock;
     }
 }
