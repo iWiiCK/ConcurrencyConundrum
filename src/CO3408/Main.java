@@ -14,7 +14,7 @@ public class Main
     public static void main(String[] args) throws InterruptedException {
 
         Scanner input = new Scanner(System.in);
-        System.out.print("\nEnter Scenario Number(1-5): >");
+        System.out.print("\nEnter Scenario Number(1-5): > ");
         String scenarioNum = input.nextLine();
         // These variables will store the configuration of the Present sorting machine
 
