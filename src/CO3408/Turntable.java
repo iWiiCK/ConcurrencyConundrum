@@ -15,22 +15,22 @@ public class Turntable extends Thread
     static int E = 1;
     static int S = 2;
     static int W = 3;
-    
     private final Connection[] connections = new Connection[4];
-
     // global lookup: age-range -> SackID
     static HashMap<String, Integer> destinations = new HashMap<>();
-
     // this individual table's lookup: SackID -> output port
     private final HashMap<Integer, Integer> outputMap = new HashMap<>();
     private int count = 0;
     private volatile boolean isRunning = true;
     private boolean itemsRemainingInBelt = false;
-    private Present[] accumulation;
+    //Max accumulation can be 4 for the 4 ports
+    private Present[] accumulation = new Present[4];
     private final Utils utils = new Utils();
+    private final OrphanedPresentCollector orphanedPresentCollector;
 
-    public Turntable (String ID){
+    public Turntable (String ID, OrphanedPresentCollector orphanedPresentCollector){
         id = ID;
+        this.orphanedPresentCollector = orphanedPresentCollector;
     }
 
     public void addConnection(int port, Connection conn){
@@ -52,11 +52,11 @@ public class Turntable extends Thread
 
     //Adding a present from the turntable to a Sack
     //////////////////////////////////////////////////////
-    private synchronized void addToSack(Sack sack, Present present) throws InterruptedException {
+    private void addToSack(Sack sack, Present present, int outputPort) throws InterruptedException {
         if(!sack.isFull()){
             System.out.println("--> Table " + id + " Adding [" + present.getAgeRange() + "] Present to Sack " + sack.getSackId() + " (Age Range: [" + sack.getAgeRange() + "])");
             sack.add(present);
-            accumulation = utils.popFirstAndReArrange(accumulation);
+            accumulation[outputPort] = null;
             count--;
         }
         else{
@@ -66,11 +66,11 @@ public class Turntable extends Thread
 
     //Adding a present from the turntable to another Belt
     //////////////////////////////////////////////////////
-    private synchronized void addToBelt(Conveyor belt, Present present) throws InterruptedException {
+    private void addToBelt(Conveyor belt, Present present, int outputPort) throws InterruptedException {
         if(!belt.isFull() && !belt.getConveyorLock().isLocked()){
             System.out.println("--> Table " + id + " Adding to Belt " + belt.getId());
             belt.add(present);
-            accumulation = utils.popFirstAndReArrange(accumulation);
+            accumulation[outputPort] = null;
             count--;
         }
         else{
@@ -87,11 +87,11 @@ public class Turntable extends Thread
         for (int port = 0; port < 4; port++) {
             currentConnection = connections[port];
 
-            if (currentConnection != null && currentConnection.getConnType() == ConnectionType.InputBelt) {
-                if (currentConnection.getBelt().getCount() > 0 ) {
+            if (currentConnection != null && currentConnection.getConnType() == ConnectionType.InputBelt && accumulation[port] == null) {
+                if (currentConnection.getBelt().getCount() > 0) {
                     System.out.println("Turntable " + id + " Requesting Present...");
                     Present currentPresent = currentConnection.getBelt().requestPresent();
-                    accumulation[count] = currentPresent;
+                    accumulation[port] = currentPresent;
                     count++;
                     //Simulating Present getting on the Turntable
                     long presentHandlingDelay = (long) (0.75 * 1000);
@@ -102,20 +102,31 @@ public class Turntable extends Thread
                     int sackId = destinations.get(ageRange);
                     int outputPort = outputMap.get(sackId);
 
-                    //Simulating time taken for the Turntable to rotate.
-                    long rotationDelay = (long) (0.5 * 1000);
-                    long totalRotationDelay =  (Math.abs(outputPort - port) * rotationDelay);
-                    Thread.sleep(totalRotationDelay);
-
-                    outputConnection = connections[outputPort];
-                    //Simulating Present getting off the Turntable and into Sacks
-                    if(outputConnection.getConnType() == ConnectionType.OutputSack){
-                        addToSack(outputConnection.getSack(), currentPresent);
-                        Thread.sleep(presentHandlingDelay);
+                    //Orphan Gift Check
+                    if(orphanedPresentCollector.isSackFull(sackId)){
+                        orphanedPresentCollector.add(currentPresent);
+                        accumulation[port] = null;
+                        count--;
                     }
-                    //Simulating Present getting off the Turntable and into another belt
-                    else if(outputConnection.getConnType() == ConnectionType.OutputBelt){
-                        addToBelt(outputConnection.getBelt(), currentPresent);
+                    else if(accumulation[outputPort] == null){
+                        //Simulating time taken for the Turntable to rotate.
+                        long rotationDelay = (long) (0.5 * 1000);
+                        long totalRotationDelay =  (Math.abs(outputPort - port) * rotationDelay);
+                        accumulation[port] = null;
+                        accumulation[outputPort] = currentPresent;
+                        Thread.sleep(totalRotationDelay);
+
+                        outputConnection = connections[outputPort];
+                        //Simulating Present getting off the Turntable and into Sacks
+                        if(outputConnection.getConnType() == ConnectionType.OutputSack){
+                            addToSack(outputConnection.getSack(), currentPresent, outputPort);
+                            Thread.sleep(presentHandlingDelay);
+                        }
+                        //Simulating Present getting off the Turntable and into another belt
+                        else if(outputConnection.getConnType() == ConnectionType.OutputBelt){
+                            addToBelt(outputConnection.getBelt(), currentPresent, outputPort);
+                            Thread.sleep(presentHandlingDelay);
+                        }
                     }
                     return true;
                 }
@@ -155,10 +166,6 @@ public class Turntable extends Thread
 
     public String getTableId() {
         return id;
-    }
-
-    public void setMaxAccumulation(int maxAccumulation) {
-        this.accumulation = new Present[maxAccumulation];
     }
 
     public Present[] getAccumulation() {

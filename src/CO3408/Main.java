@@ -140,6 +140,8 @@ public class Main
             Turntable.destinations.put(age, id);
         } // end of reading sack lines
 
+        OrphanedPresentCollector orphanedPresentCollector = new OrphanedPresentCollector(sacks);
+
         // READ TURNTABLES
         // ---------------
         // Skip though any blank lines
@@ -157,7 +159,7 @@ public class Main
             // A N ib 1 E null S os 1 W null
 
             String tableId = inputStream.next();
-            tables[t] = new Turntable(tableId);
+            tables[t] = new Turntable(tableId, orphanedPresentCollector);
 
             int connId;
 
@@ -266,7 +268,8 @@ public class Main
         // END OF SETUP ///////////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////////////////
         
-        
+        orphanedPresentCollector.setMaxAccumulation(numPresents);
+
         // START the hoppers!
         for (Hopper hopper : hoppers){
             hopper.start();
@@ -274,7 +277,6 @@ public class Main
 
         // START the turntables!
         for (Turntable table : tables){
-            table.setMaxAccumulation(numPresents);
             table.start();
         }
 
@@ -342,6 +344,6 @@ public class Main
         System.out.println("-----------------------------------------\n");
         System.out.println("Configuration: " + FILE_NAME);
         System.out.println("Total Run Time: " + (endTime - startTime) / 1000 + "s.");
-        Utils.displayReport(DISPLAY_EXTENDED_REPORT, endTime, hoppers, sacks, tables, belts);
+        Utils.displayReport(DISPLAY_EXTENDED_REPORT, endTime, hoppers, sacks, tables, belts, orphanedPresentCollector);
     }
 }

@@ -6,7 +6,7 @@ public class Utils
         for (int i = 0; i < collection.length -1 ; i++){
             collection[i] = collection[i+1];
         }
-
+        collection[collection.length -1] = null;
         return collection;
     }
 
@@ -67,7 +67,7 @@ public class Utils
 
     //Method for Displaying final Report (Extended Report or the default one)
     ///////////////////////////////////////////////////////////////////////////
-    public synchronized static void displayReport(boolean isExtednedReport, Long endTime, Hopper[] hoppers, Sack[] sacks, Turntable[] tables, Conveyor[] belts){
+    public synchronized static void displayReport(boolean isExtednedReport, Long endTime, Hopper[] hoppers, Sack[] sacks, Turntable[] tables, Conveyor[] belts, OrphanedPresentCollector orphanedPresentCollector){
         int giftsDeposited = countGiftsDeposited(hoppers);
 
         for (Hopper hopper : hoppers){
@@ -100,18 +100,24 @@ public class Utils
                 System.out.println("Belt " + belt.getId() + " has " + belt.getCount() + " Presents on it");
 
                 if(belt.getCount() > 0){
-                    System.out.println("Present Left...");
                     for (Present present : belt.getPresents()){
                         if(present != null)
                             System.out.println(present.getAgeRange());
                     }
                 }
             }
+
+            System.out.println("Orphanded Presents: " + orphanedPresentCollector.getCount());
+            for (Present present: orphanedPresentCollector.getOrphanPresents()){
+                if(present != null){
+                    System.out.println(present.getAgeRange());
+                }
+            }
         }
 
         System.out.println();
 
-        int giftsOnMachine = countGiftsIn(tables) + countGiftsIn(belts);
+        int giftsOnMachine = countGiftsIn(tables) + countGiftsIn(belts) + orphanedPresentCollector.getCount();
         int giftsInSacks = countGiftsIn(sacks);
 
         System.out.print("\nOut of " + giftsDeposited + " gifts deposited, ");
