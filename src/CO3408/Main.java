@@ -19,6 +19,7 @@ public class Main
         // These variables will store the configuration of the Present sorting machine
 
         final String FILE_NAME = "scenario" + scenarioNum + ".txt";
+        final boolean DISPLAY_EXTENDED_REPORT = true;
         
         int numBelts;
         Conveyor[] belts;
@@ -311,11 +312,11 @@ public class Main
         System.out.println("*** Input Stopped after " + (endTime - startTime) / 1000 + "s. ***");
         System.out.println("/////////////////////////////////////////////////////");
 
-        // Stop the hoppers!
+        // STOP the hoppers!
         for(Hopper hopper : hoppers){
             hopper.stopHopper();
         }
-        // Stop the tables!
+        // STOP the tables!
         for(Turntable table : tables){
             table.stopTurntable();
         }
@@ -337,62 +338,10 @@ public class Main
         
         // FINAL REPORTING
         ////////////////////////////////////////////////////////////////////////
-
         System.out.println("\nFINAL REPORT");
         System.out.println("-----------------------------------------\n");
         System.out.println("Configuration: " + FILE_NAME);
         System.out.println("Total Run Time: " + (endTime - startTime) / 1000 + "s.");
-        
-        int giftsDeposited = Utils.countGiftsDeposited(hoppers);
-        
-        for (Hopper hopper : hoppers){
-            System.out.println("Hopper " + hopper.getHopperId() + " deposited " + hopper.getDepositCount() + " presents and waited " + (endTime - hopper.getHopperEmptiedTimestamp())/1000 + "s.");
-        }
-
-        for (Sack sack : sacks){
-            System.out.println("Sack " + sack.getSackId() + "(Age Range: [" + sack.getAgeRange() + "]) is " + sack.getCount() + "/" + sack.getCapacity() + " Filled with Presents");
-            if(sack.getCount() > 0 ){
-                System.out.println("Present...");
-                for (Present present : sack.getAccumulation()){
-                    if(present != null)
-                        System.out.println(present.getAgeRange());
-                }
-            }
-        }
-
-        for (Turntable table : tables){
-            System.out.println("Table " + table.getTableId() + " has " + table.getCount() + " Presents on it");
-
-            if(table.getCount() > 0){
-                System.out.println("Present Left...");
-                for (Present present : table.getAccumulation()){
-                    if(present != null)
-                        System.out.println(present.getAgeRange());
-                }
-            }
-        }
-
-        for (Conveyor belt : belts){
-            System.out.println("Belt " + belt.getId() + " has " + belt.getCount() + " Presents on it");
-
-            if(belt.getCount() > 0){
-                System.out.println("Present Left...");
-                for (Present present : belt.getPresents()){
-                    System.out.println(present.getAgeRange());
-                }
-            }
-        }
-
-        System.out.println();
-
-        int giftsOnMachine = Utils.countGiftsIn(tables) + Utils.countGiftsIn(belts);
-        int giftsInSacks = Utils.countGiftsIn(sacks);
-        
-        System.out.print("\nOut of " + giftsDeposited + " gifts deposited, ");
-        System.out.print(giftsOnMachine + " are still on the machine, and ");
-        System.out.println(giftsInSacks + " made it into the sacks");
-
-        int missing = giftsDeposited - giftsInSacks - giftsOnMachine;
-        System.out.println(missing + " gifts went missing.");
+        Utils.displayReport(DISPLAY_EXTENDED_REPORT, endTime, hoppers, sacks, tables, belts);
     }
 }

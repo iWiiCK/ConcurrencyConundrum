@@ -68,17 +68,18 @@ public class Hopper extends Thread
             }
         }
 
-        if(!belt.isFull() && isRunning){
-            System.out.println("::: Hopper "+ id + " DEPOSITING :: Remaining [" + count + "]");
-            //Assuming speed is the deposit speed in seconds.
-            // Ex: Speed 1 = presents are deposited every 1 second.
-            sleep(speed * 1000L);
-
-            belt.add(collection[0]);
-            depositCount++;
-            count--;
-            collection = utils.popFirstAndReArrange(collection);
+        //Assuming speed is the deposit count per second.
+        // Ex: Speed 2 = 2 presents  deposited per second.
+        for(int i = 0 ; i < speed; i ++){
+            if(!belt.isFull() && isRunning){
+                System.out.println("::: Hopper "+ id + " DEPOSITING :: Remaining [" + count + "]");
+                belt.add(collection[0]);
+                depositCount++;
+                count--;
+                collection = utils.popFirstAndReArrange(collection);
+            }
         }
+        sleep(speed * 1000L);
     }
 
     public boolean isFull(){
