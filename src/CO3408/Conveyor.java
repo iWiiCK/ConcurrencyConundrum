@@ -42,7 +42,8 @@ public class Conveyor
     }
 
     //Give the present added earliest to the Turntable.
-    public synchronized Present requestPresent(){
+    public synchronized Present requestPresent(String tableId){
+        System.out.println("Turntable " + tableId + " Requesting Present...");
         Present earliestPresent = presents[0];
         presents = utils.popFirstAndReArrange(presents);
         count--;

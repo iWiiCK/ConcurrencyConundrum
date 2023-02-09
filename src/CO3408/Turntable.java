@@ -79,34 +79,40 @@ public class Turntable extends Thread
         }
     }
 
+    private void cleanOrphanPresents(Present present, int port){
+        orphanedPresentCollector.add(present);
+        accumulation[port] = null;
+        count--;
+    }
+
     //Driver method for the Turntable from inside the Run method
     ///////////////////////////////////////////////////////////////
     private synchronized boolean runTurntable() throws InterruptedException {
         Connection currentConnection, outputConnection;
+        Present currentPresent;
+        int sackId;
+        int outputPort;
+        long presentHandlingDelay = (long) (0.75 * 1000);
         // Polling all connected input conveyor belts in turn
         for (int port = 0; port < 4; port++) {
             currentConnection = connections[port];
 
-            if (currentConnection != null && currentConnection.getConnType() == ConnectionType.InputBelt && accumulation[port] == null) {
-                if (currentConnection.getBelt().getCount() > 0) {
-                    System.out.println("Turntable " + id + " Requesting Present...");
-                    Present currentPresent = currentConnection.getBelt().requestPresent();
+            if (currentConnection != null && currentConnection.getConnType() == ConnectionType.InputBelt) {
+                if (currentConnection.getBelt().getCount() > 0 && accumulation[port] == null) {
+                    currentPresent = currentConnection.getBelt().requestPresent(id);
                     accumulation[port] = currentPresent;
                     count++;
                     //Simulating Present getting on the Turntable
-                    long presentHandlingDelay = (long) (0.75 * 1000);
                     Thread.sleep(presentHandlingDelay);
 
                     //Using the Hashmaps for destination and port lookups.
                     String ageRange = currentPresent.getAgeRange();
-                    int sackId = destinations.get(ageRange);
-                    int outputPort = outputMap.get(sackId);
+                    sackId = destinations.get(ageRange);
+                    outputPort = outputMap.get(sackId);
 
                     //Orphan Gift Check
                     if(orphanedPresentCollector.isSackFull(sackId)){
-                        orphanedPresentCollector.add(currentPresent);
-                        accumulation[port] = null;
-                        count--;
+                        cleanOrphanPresents(currentPresent, port);
                     }
                     else if(accumulation[outputPort] == null){
                         //Simulating time taken for the Turntable to rotate.
@@ -131,6 +137,34 @@ public class Turntable extends Thread
                     return true;
                 }
                 return false;
+            }
+            else if (currentConnection != null && currentConnection.getConnType() == ConnectionType.OutputBelt){
+                currentPresent = accumulation[port];
+
+                if(currentPresent != null){
+                    sackId = destinations.get(currentPresent.getAgeRange());
+                    if(orphanedPresentCollector.isSackFull(sackId)){
+                        cleanOrphanPresents(currentPresent, port);
+                    }
+                    else{
+                        addToBelt(currentConnection.getBelt(), currentPresent, port);
+                        Thread.sleep(presentHandlingDelay);
+                    }
+                }
+            }
+            else if (currentConnection != null && currentConnection.getConnType() == ConnectionType.OutputSack){
+                currentPresent = accumulation[port];
+
+                if(currentPresent != null){
+                    sackId = currentConnection.getSack().getSackId();
+                    if(orphanedPresentCollector.isSackFull(sackId)){
+                        cleanOrphanPresents(currentPresent, port);
+                    }
+                    else{
+                        addToBelt(currentConnection.getBelt(), currentPresent, port);
+                        Thread.sleep(presentHandlingDelay);
+                    }
+                }
             }
             return false;
         }
