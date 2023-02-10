@@ -6,6 +6,9 @@ package CO3408;
  *  - Orphanced presents in this context are Presents that are in the machine but where the destination sack is FULL!.
  *  - This is used so that the Turntable does not get filled with these presents.
  *  - The MAX size is 'set' by using the 'Presents Count' from the Configuration Files.
+ *  - 'OrphanCollectors' are connected with Turntables because a Present can become orphaned while it is on a belt
+ *      when another present before that fills up the destination sack.
+ *  - Because of this, the filtering does not happen while putting a present from the Hopper to a belt.
  * */
 public class OrphanedPresentCollector
 {
