@@ -114,7 +114,7 @@ public class Utils
                 }
             }
 
-            System.out.println("Orphanded Presents: " + orphanedPresentCollector.getCount());
+            System.out.println("Orphaned Presents: " + orphanedPresentCollector.getCount());
             for (Present present: orphanedPresentCollector.getOrphanPresents()){
                 if(present != null){
                     System.out.println(present.getAgeRange());

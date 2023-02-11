@@ -898,7 +898,7 @@ Belt 3 has 0 Presents on it
 Belt 4 has 0 Presents on it
 Belt 5 has 0 Presents on it
 Belt 6 has 0 Presents on it
-Orphanded Presents: 0
+Orphaned Presents: 0
 
 
 Out of 36 gifts deposited, 0 are still on the machine, and 36 made it into the sacks
