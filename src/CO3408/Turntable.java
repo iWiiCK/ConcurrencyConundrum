@@ -181,8 +181,8 @@ public class Turntable extends Thread
         return true;
     }
 
-    //Check whether the turnrable could be Shutdown.
-    // If not presents exist in the maschine, then all the Turntables can be Shutdowned.
+    //Check whether the turntable could be Shutdown.
+    // If no presents exist in the machine, then all the Turntables can be Shutdowned.
     /////////////////////////////////////////////////////////////////////////////////////
     private boolean canShutdown(){
         for (HashMap.Entry<Integer, Integer> belt : beltPresentCountChecker.entrySet()){
