@@ -1,6 +1,7 @@
 package CO3408;
 /**
  *  @author Heshan Wickramaratne.
+ *  Uclan ID: G20863503
  *
  *  The 'OrphanedPresentCollector' class is used to collect all Orphaned presents.
  *  - Orphanced presents in this context are Presents that are in the machine but where the destination sack is FULL!.
