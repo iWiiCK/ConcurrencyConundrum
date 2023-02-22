@@ -1,10 +1,9 @@
 package CO3408;
-
-import java.util.HashMap;
 import java.util.HashSet;
+
 /**
- *
  * @author Heshan Wickramaratne
+ * Uclan ID: G20863503
  */
 public class Conveyor
 {
@@ -13,13 +12,13 @@ public class Conveyor
     private final CustomLock conveyorLock;
     private final Utils utils = new Utils();
     private final int size;
-    private final HashMap<Integer, Integer> beltPresentCountChecker;
+    private final CustomHashMap<Integer, Integer> beltPresentCountChecker;
     // Count of presents on the belt
     private int count = 0;
     // The requirements say this must be a fixed size array
     private Present[] presents;
     
-    public Conveyor(int id, int size, HashMap<Integer, Integer> beltPresentCountChecker){
+    public Conveyor(int id, int size, CustomHashMap<Integer, Integer> beltPresentCountChecker){
         this.id = id;
         this.presents = new Present[size];
         this.size = size;
