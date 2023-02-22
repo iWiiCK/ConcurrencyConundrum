@@ -3,13 +3,11 @@ package CO3408;
 import java.io.File;
 import java.io.FileNotFoundException;
 import static java.lang.Thread.sleep;
-
-import java.util.HashMap;
 import java.util.Scanner;
 
 /**
- *
  * @author Heshan Wickramaratne
+ * Uclan ID: G20863503
  */
 public class Main
 {

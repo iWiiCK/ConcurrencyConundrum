@@ -1,5 +1,11 @@
 package CO3408;
 
+/**
+ * @author Heshan Wickramaratne.
+ * Uclan ID: G20863503
+ *
+ * This class represets a simple Custom Lock created for Synchronization.
+ * */
 public class CustomLock
 {
     private final String id;

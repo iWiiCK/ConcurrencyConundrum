@@ -1,12 +1,11 @@
-
 package CO3408;
 
 import java.util.HashMap;
 import java.util.*;
 
 /**
- *
  * @author Heshan Wickramaratne
+ * Uclan ID: G20863503
  */
 public class Turntable extends Thread
 {

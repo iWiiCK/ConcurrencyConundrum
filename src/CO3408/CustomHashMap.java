@@ -3,6 +3,7 @@ import java.util.Arrays;
 
 /**
  * @author Heshan Wickramaratne.
+ * Uclan ID: G20863503
  *
  * This class represets a Custom hashmap I created for keeping track of Presents on belts and Turntables.
  * This is because the assignment has specified that we are not allowed to use Data structures other than arrays.
