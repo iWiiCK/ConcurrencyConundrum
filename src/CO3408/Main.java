@@ -39,8 +39,8 @@ public class Main
         Turntable[] tables;
 
         //Shared maps between all the Tables and Belts to keep track of Presents currently in the system.
-        HashMap<Integer, Integer> beltPresentCountChecker = new HashMap<>();
-        HashMap<String, Integer> tablePresentCountChecker = new HashMap<>();
+        CustomHashMap<Integer, Integer> beltPresentCountChecker;
+        CustomHashMap<String, Integer> tablePresentCountChecker;
 
         int timerLength;
         int numPresents = 0;
@@ -70,6 +70,7 @@ public class Main
         inputStream.nextLine();
 
         belts = new Conveyor[numBelts];
+        beltPresentCountChecker = new CustomHashMap<>(numBelts);
 
         for (int b = 0; b < numBelts; b++){
             line = inputStream.nextLine(); // e.g. 1 length 5 destinations 1 2
@@ -159,6 +160,7 @@ public class Main
         inputStream.nextLine();
 
         tables = new Turntable[numTurntables];
+        tablePresentCountChecker = new CustomHashMap<>(numTurntables);
 
         for (int t = 0; t < numTurntables; t++){
             // Each turntable line will look like this:

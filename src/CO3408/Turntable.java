@@ -25,13 +25,13 @@ public class Turntable extends Thread
     private final int portCount = 4;
     private final Present[] accumulation = new Present[portCount];
     private final OrphanedPresentCollector orphanedPresentCollector;
-    private final HashMap<Integer, Integer> beltPresentCountChecker;
-    private final HashMap<String, Integer> tablePresentCountChecker;
+    private final CustomHashMap<Integer, Integer> beltPresentCountChecker;
+    private final CustomHashMap<String, Integer> tablePresentCountChecker;
     // Count of Presents on the Table.
     private int count = 0;
     private boolean itemsRemainingInBelt = false;
 
-    public Turntable (String ID, OrphanedPresentCollector orphanedPresentCollector, HashMap<Integer, Integer> beltPresentCountChecker, HashMap<String, Integer> tablePresentCountChecker){
+    public Turntable (String ID, OrphanedPresentCollector orphanedPresentCollector, CustomHashMap<Integer, Integer> beltPresentCountChecker, CustomHashMap<String, Integer> tablePresentCountChecker){
         id = ID;
         this.orphanedPresentCollector = orphanedPresentCollector;
         this.beltPresentCountChecker = beltPresentCountChecker;
@@ -185,15 +185,8 @@ public class Turntable extends Thread
     // If no presents exist in the machine, then all the Turntables can be Shutdowned.
     /////////////////////////////////////////////////////////////////////////////////////
     private boolean canShutdown(){
-        for (HashMap.Entry<Integer, Integer> belt : beltPresentCountChecker.entrySet()){
-            if(belt.getValue() > 0) return false;
-        }
-
-        for (HashMap.Entry<String, Integer> table : tablePresentCountChecker.entrySet()){
-            if(table.getValue() > 0) return false;
-        }
-
-        return true;
+        if(beltPresentCountChecker.hasIntValsHigherThan(0)) return false;
+        else return !tablePresentCountChecker.hasIntValsHigherThan(0);
     }
 
     // Used to Stop the Thread ones the Time is up for the Simulation
